@@ -2,10 +2,10 @@
 Es una herramienta la cual nos permite hacer tests de concurrencia.
 
 == Quick start
-Necesitaremos instalar Mercurial, Maven y Java 9.
+Necesitaremos instalar Mercurial, Maven y Java 8.
 
 * Check out source code
-	- hg clone http://hg.openjdk.java.net/code-tools/jcstress/ jcstress
+	- hg clone http://hg.openjdk.java.net/code-tools/jcstress/ jcstress (La herramienta ya esta usando Java 9 por lo cual podemos hacer un clone hasta una revision anterior para usar Java 8 hg clone http://hg.openjdk.java.net/code-tools/jcstress/ -r 261 jcstress)
 	- cd jcstress/
 * Build jcstress
 	- mvn clean install -pl tests-custom -am (Dado que es un proyecto grande, solo ejecutamos el build para un subset minimo de proyectos)
