@@ -1,0 +1,13 @@
+= Java Memory Model Pragmatics (transcript) en español
+Este repositorio contiene la traduccion del transcript en ingles y ademas ejemplifica los conceptos utilizando jcstress. Este documento es una guia para ir explicando diversos conceptos que estan relacionado con el comportamiento del Java Memory Model, por lo cual encontraremos distintos links a documentos auxiliares.
+
+:toc:
+
+== Prologo
+Prologo
+
+== Introduccion
+Introduccion
+
+== Parte I. Acceso atomico (Access Atomicity)
+Acceso atomico
