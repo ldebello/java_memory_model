@@ -1,0 +1,4 @@
+rootProject.name = 'JavaMemoryModel'
+include ':JCStressTutorial'
+
+project(':JCStressTutorial').projectDir = "$rootDir/JCStressTutorial" as File

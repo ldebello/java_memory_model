@@ -3,11 +3,20 @@
 .project
 .settings/
 
-# Mac
-.DS_Store
+# Dependencies
+lib/
 
 # Maven
 target/
 
-# Dependencies
-lib/
+# Gradle
+.gradle
+build/
+bin/
+
+# JCStress Gradle Plugin
+results/
+jcstress.*
+
+# Mac
+.DS_Store
