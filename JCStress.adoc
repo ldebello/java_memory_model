@@ -19,3 +19,22 @@ que tenga la dependencia de jcstress y lo ejecutaremos por medio de un plugin gr
 https://github.com/jerzykrlk/jcstress-gradle-plugin[JCStress Gradle Plugin]
 
 Para tener una idea de un test simple podemos ver el proyecto "JCStressTutorial", el cual contiene una clase llamada "BitSetConcurrencyTest" con la explicacion de las annotations que utilizamos con jcstress, luego podemos ver los resultados en un HTML generado en la carpeta "results"
+Si ejecutamos los test del proyecto de "JCStressTutorial" veremos que los tres casos mencionados con las annotations @Outcome pueden suceder, lo cual podria no ser lo esperado ya que cada Thread esta escribiendo un valor distinto, la explicacion de porque sucede este comportamiento la veremos en las slides traducidas cuando se hable de Word Tearing, si leemos la documentacion de BitSet veremos que dice que no es Thread Safe por lo cual para arreglar el test podemos incluir un bloque synchronized para cada actor.
+
+[source,java]
+----
+@Actor
+public void thread1() {
+	synchronized (sharedBitSet) {
+		sharedBitSet.set(1);
+	}
+}
+
+@Actor
+public void thread2() {
+	synchronized (sharedBitSet) {
+		sharedBitSet.set(2);
+	}
+}
+----
+
