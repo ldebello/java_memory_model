@@ -12,3 +12,10 @@ Necesitaremos instalar Mercurial, Maven y Java 8.
 	- Podemos usar "java -jar tests-custom/target/jcstress.jar -h" para obtener ayuda sobre los parametros
 
 == Nuestro primer test
+
+Para crear nuestro primer test, podemos agregarlos en la carpeta "tests-custom" del mismo repositorio de jcstress, o podemos crear un nuevo proyecto que tenga de dependencia a jcstress. Para nuestros ejemplos vamos a crear nuevos proyectos
+que tenga la dependencia de jcstress y lo ejecutaremos por medio de un plugin gradle para ejecutar jcstress
+
+https://github.com/jerzykrlk/jcstress-gradle-plugin[JCStress Gradle Plugin]
+
+Para tener una idea de un test simple podemos ver el proyecto "JCStressTutorial", el cual contiene una clase llamada "BitSetConcurrencyTest" con la explicacion de las annotations que utilizamos con jcstress, luego podemos ver los resultados en un HTML generado en la carpeta "results"
