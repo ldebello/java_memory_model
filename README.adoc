@@ -14,7 +14,8 @@ Estaremos reutilizando un monton de slides, y trataremos de construir una narrac
 Se agradece a https://twitter.com/BrianGoetz[Brian Goetz], Doug Lea, David Holmes, https://twitter.com/kuksenk0[Sergey Kuksenko], Dmitry Chyuko, https://twitter.com/AstragaliUSA[Mark Cooper], https://twitter.com/cscotta[C. Scott Andreas], https://twitter.com/joejkearney[Joe Kearney] y muchos otros por sus correciones y comentarios utiles. La seccion sobre "final fields" contiene informacion provista por https://twitter.com/VladimirSitnikv[Vladimir Sitnikov] y Valentin Kovalenko, asi como el extracto de su charla sobre http://www.slideshare.net/VladimirSitnikv/final-field-semantics["Final Fields Semantics"].
 
 == Introduccion
-Introduccion
+
+image::slides/page-004.png
 
 == Parte I. Acceso atomico (Access Atomicity)
 Acceso atomico
