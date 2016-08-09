@@ -1,5 +1,6 @@
 = Java Memory Model Pragmatics (transcript) en español
 Este repositorio contiene la traduccion del transcript en ingles y ademas ejemplifica los conceptos utilizando jcstress. Este documento es una guia para ir explicando diversos conceptos que estan relacionado con el comportamiento del Java Memory Model, por lo cual encontraremos distintos links a documentos auxiliares.
+Para los link:JCStress.adoc[ejemplos] vamos a utilizar la herramienta JCStress
 :toc: macro
 
 toc::[]
