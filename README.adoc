@@ -15,7 +15,9 @@ Se agradece a https://twitter.com/BrianGoetz[Brian Goetz], Doug Lea, David Holme
 
 == Introduccion
 
-image::slides/page-004.png[page-004.png]
+image::slides/page-004.png[]
+
+First, a simple detector slide. Hey there, https://twitter.com/gakesson[@gakesson], *waves!*
 
 == Parte I. Acceso atomico (Access Atomicity)
 Acceso atomico
