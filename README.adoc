@@ -21,19 +21,20 @@ Primero, una slide para romper el hielo. https://twitter.com/gakesson[@gakesson]
 
 image::slides/JMM-Slide02.png[]
 
-If you read just about any language spec, you will notice it can be logically divided into two related, but distinct parts. First, a very easy part, is the language syntax, which describes how to write programs in the language. Second, the largest part, is the language semantics, which describes exactly what a particular syntax construct means. Language specs usually describe the semantics via the behavior of an abstract machine which executes the program, so the language spec in this manner is just an abstract machine spec.
+Si leemos cualquier spec acerca de un lenguaje, vamos a notar que puede ser dividad en dos partes relacionadas pero distintas. Primero, nos encontramos con una parte simple, la cual llamamos sintaxis (syntax), la cual describe como escribir programas en ese lenguaje. Segundo, la parte mas complicada es conocida como semantica (semantics), la cual describe exactamente lo que significa cada sintaxis en particular. Generalmente, las spec describen la semantica por medio del comportamiento de una https://es.wikipedia.org/wiki/Máquina_abstracta[abstract machine] que ejecuta el programa, de este modo la spec es solo una especificacion de abstract machine.
 
 image::slides/JMM-Slide03.png[]
 
-When your language has storage (in the form of variables, heap memory, etc.), the abstract machine also has storage, and you have to define a set of rules concerning how that storage behaves. That’s what we call a memory model. If your language does not have explicit storage (e.g. you pass the data around in call contexts), then your memory model is darn simple. In storage-savvy languages, the memory models appear to answer a simple question: "What values can a particular read observe?"
+Cuando el lenguaje posee almacenamiento (Variables, Heap Memory, etc.), la abstract machine tambien posee almacenamiento, y tenemos que definir un conjuntos de reglas acerca de como se comporta el almacenamiento. Esto es lo que llamamos "memory model". Si el lenguaje no posee almacenamiento explicito (e.g los datos son pasados en contextos de llamadas), entonces tu modelo de memoria es bastante simple. El "memory model" parece responder a una pregunta simple: ¿Que valores puede observar una instruccion read?
 
 image::slides/JMM-Slide04.png[]
 
-In sequential programs, that seems a vacuous question to ask: since you have the sequential program, the stores into memory are coming in some given order, and it is obvious that the reads should observe the latest writes in that order. That is why people usually meet with memory models only for multi-threaded programs, where this question becomes complicated. However, memory models matter even in the sequential cases (although they are often cleverly disguised in the notion of evaluation order).
+En programas secuenciales, esto parece ser una pregunta sin mucho sentido, porque si nuestro programa es secuencial, cada store en la memoria viene dado con un determinado orden, y es obvio que cada "read" debe observar el ultimo "write" aplicado. Por eso solemnos cruzarnos con el concepto de "memory model" en programas mult-thread, donde esta pregunta se vuelve mas complicada de responder. Sin embargo el "memory model" tambien importa en programas secuenciales (Aunque en este caso esta inteligentemente disfrazado en la nocion de orden de evaluacion).
 
 image::slides/JMM-Slide05.png[]
 
-For example, the infamous example of undefined behavior in a C program that packs a few increments between the sequence points. This program can satisfy the given assert, but can also fail it, or otherwise summon nasal demons. One could argue that the result of this program can be different because the evaluation order of increments is different, but it would not explain, e.g. the result of 12, when neither increment saw the written value from the other. This is the memory model concern: what value should each increment see (and by extension, what it would store).
+Por ejemplo, el abominable ejemplo de link:UndefinedBehaviour.adoc["undefined behaviour"] en un programa "C", que utiliza algunos incremento entre los link:SequencePoint.adoc["sequence points"].
+Este programa puede satisfacer la condicion establecidad o fallar o hasta link:UndefinedBehaviour.adoc#Nasal demons["nasal demons"]. Uno podria argumentar que el resultado de este programa puede ser diferente porque el orden de evaluacion de los incrementos es diferente, pero eso no explicaria, el resultado de "12", cuando ninguno de los incrementos puede ver el valor escrito por el otro. Esta es una preocupación del "memory model": ¿Que valor debe ser visto por cada incremento, y que deberia ser almacenado?
 
 image::slides/JMM-Slide06.png[]
 

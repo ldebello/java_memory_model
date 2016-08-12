@@ -1,0 +1,8 @@
+= Undefined Behaviour
+
+_Extraido de la Wikipedia_
+
+Undefined behaviour (UB) es el resultado de ejecutar codigo que no tiene un comportamiento definido por la spec del lenguaje, para el estado actual del programa. Esto sucede cuando el compilador del codigo considera ciertas supuestos, pero estos supuestos no son satisfechos durante la ejecución.
+
+== Nasal demons
+Esto a menudo puede generar bugs. En la comunidad del lenguaje C, "undefined behaviour" es tambien referido como "nasal demons", este nombre surgio luego de una explicacion en el grupo "comp.std.c", donde se explica "undefined behaviour" como una forma de permitirle al compilador hacer lo que el elija frente a construcciones indefinidas, incluso "to make demons fly out of your nose".
