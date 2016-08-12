@@ -34,7 +34,7 @@ En programas secuenciales, esto parece ser una pregunta sin mucho sentido, porqu
 image::slides/JMM-Slide05.png[]
 
 Por ejemplo, el abominable ejemplo de link:UndefinedBehaviour.adoc["undefined behaviour"] en un programa "C", que utiliza algunos incremento entre los link:SequencePoint.adoc["sequence points"].
-Este programa puede satisfacer la condicion establecidad o fallar o hasta link:UndefinedBehaviour.adoc["nasal demons"]. Uno podria argumentar que el resultado de este programa puede ser diferente porque el orden de evaluacion de los incrementos es diferente, pero eso no explicaria, el resultado de "12", cuando ninguno de los incrementos puede ver el valor escrito por el otro. Esta es una preocupación del "memory model": ¿Que valor debe ser visto por cada incremento, y que deberia ser almacenado?
+Este programa puede satisfacer la condicion establecidad o fallar o hasta link:UndefinedBehaviour.adoc#nasal-demons["nasal demons"]. Uno podria argumentar que el resultado de este programa puede ser diferente porque el orden de evaluacion de los incrementos es diferente, pero eso no explicaria, el resultado de "12", cuando ninguno de los incrementos puede ver el valor escrito por el otro. Esta es una preocupación del "memory model": ¿Que valor debe ser visto por cada incremento, y que deberia ser almacenado?
 
 image::slides/JMM-Slide06.png[]
 
