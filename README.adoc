@@ -15,9 +15,52 @@ Se agradece a https://twitter.com/BrianGoetz[Brian Goetz], Doug Lea, David Holme
 
 == Introduccion
 
-image::slides/page-004.png[]
+image::slides/JMM-Slide01.png[]
 
-First, a simple detector slide. Hey there, https://twitter.com/gakesson[@gakesson], *waves!*
+Primero, una slide para romper el hielo. https://twitter.com/gakesson[@gakesson], *saludanos!*
+
+image::slides/JMM-Slide02.png[]
+
+If you read just about any language spec, you will notice it can be logically divided into two related, but distinct parts. First, a very easy part, is the language syntax, which describes how to write programs in the language. Second, the largest part, is the language semantics, which describes exactly what a particular syntax construct means. Language specs usually describe the semantics via the behavior of an abstract machine which executes the program, so the language spec in this manner is just an abstract machine spec.
+
+image::slides/JMM-Slide03.png[]
+
+When your language has storage (in the form of variables, heap memory, etc.), the abstract machine also has storage, and you have to define a set of rules concerning how that storage behaves. That’s what we call a memory model. If your language does not have explicit storage (e.g. you pass the data around in call contexts), then your memory model is darn simple. In storage-savvy languages, the memory models appear to answer a simple question: "What values can a particular read observe?"
+
+image::slides/JMM-Slide04.png[]
+
+In sequential programs, that seems a vacuous question to ask: since you have the sequential program, the stores into memory are coming in some given order, and it is obvious that the reads should observe the latest writes in that order. That is why people usually meet with memory models only for multi-threaded programs, where this question becomes complicated. However, memory models matter even in the sequential cases (although they are often cleverly disguised in the notion of evaluation order).
+
+image::slides/JMM-Slide05.png[]
+
+For example, the infamous example of undefined behavior in a C program that packs a few increments between the sequence points. This program can satisfy the given assert, but can also fail it, or otherwise summon nasal demons. One could argue that the result of this program can be different because the evaluation order of increments is different, but it would not explain, e.g. the result of 12, when neither increment saw the written value from the other. This is the memory model concern: what value should each increment see (and by extension, what it would store).
+
+image::slides/JMM-Slide06.png[]
+
+Either way, when presented with a challenge of implementing the particular language, we can go one of two ways: interpretation, or compilation of abstract machine to the target hardware. Both interpretation and compilation are connected via https://en.wikipedia.org/wiki/Partial_evaluation#Futamura_projections[Futamura Projections] anyway.
+
+The practical takeaway is that both interpreter and compiler are tasked with emulating the abstract machine. Compilers are usually blamed for screwing up the memory models and multi-threaded programs, but interpreters are not immune, either. Failing to run an interpreter to the abstract machine spec may result in memory model violations. The simplest example: cache the field values over volatile reads in an interpreter, and you are done for. This takes us to an interesting trade-off.
+
+image::slides/JMM-Slide07.png[]
+
+The very reason why programming languages still require smart developers is the absence of hypersmart compilers. "Hyper" is not a overstatement: some of the problems in compiler engineering are undecidable, that is, non-solvable even in theory, let alone in practice. Other interesting problems may be theoretically feasible, but not practical. Therefore, to make practical (optimizing) compilers possible, we need to cause some inconvenience in the language. The same goes for hardware, since (at least for Turing machines) it is just the algorithms in silica.
+
+image::slides/JMM-Slide08.png[]
+
+To elaborate on this thought, the rest of the talk is structured as follows.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 == Parte I. Acceso atomico (Access Atomicity)
 Acceso atomico
