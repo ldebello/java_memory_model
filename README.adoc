@@ -15,53 +15,40 @@ Se agradece a https://twitter.com/BrianGoetz[Brian Goetz], Doug Lea, David Holme
 
 == Introduccion
 
-image::slides/JMM-Slide01.png[]
+image::images/jmm/001.png[]
 
 Primero, una slide para romper el hielo. https://twitter.com/gakesson[@gakesson], *saludanos!*
 
-image::slides/JMM-Slide02.png[]
+image::images/jmm/002.png[]
 
 Si leemos cualquier spec acerca de un lenguaje, vamos a notar que puede ser dividad en dos partes relacionadas pero distintas. Primero, nos encontramos con una parte simple, la cual llamamos sintaxis (syntax), la cual describe como escribir programas en ese lenguaje. Segundo, la parte mas complicada es conocida como semantica (semantics), la cual describe exactamente lo que significa cada sintaxis en particular. Generalmente, las spec describen la semantica por medio del comportamiento de una https://es.wikipedia.org/wiki/Máquina_abstracta[abstract machine] que ejecuta el programa, de este modo la spec es solo una especificacion de abstract machine.
 
-image::slides/JMM-Slide03.png[]
+image::images/jmm/003.png[]
 
 Cuando el lenguaje posee almacenamiento (Variables, Heap Memory, etc.), la abstract machine tambien posee almacenamiento, y tenemos que definir un conjuntos de reglas acerca de como se comporta el almacenamiento. Esto es lo que llamamos "memory model". Si el lenguaje no posee almacenamiento explicito (e.g los datos son pasados en contextos de llamadas), entonces tu modelo de memoria es bastante simple. El "memory model" parece responder a una pregunta simple: ¿Que valores puede observar una instruccion read?
 
-image::slides/JMM-Slide04.png[]
+image::images/jmm/004.png[]
 
 En programas secuenciales, esto parece ser una pregunta sin mucho sentido, porque si nuestro programa es secuencial, cada store en la memoria viene dado con un determinado orden, y es obvio que cada "read" debe observar el ultimo "write" aplicado. Por eso solemnos cruzarnos con el concepto de "memory model" en programas mult-thread, donde esta pregunta se vuelve mas complicada de responder. Sin embargo el "memory model" tambien importa en programas secuenciales (Aunque en este caso esta inteligentemente disfrazado en la nocion de orden de evaluacion).
 
-image::slides/JMM-Slide05.png[]
+image::images/jmm/005.png[]
 
 Por ejemplo, el abominable ejemplo de link:UndefinedBehaviour.adoc["undefined behaviour"] en un programa "C", que utiliza algunos incremento entre los link:SequencePoint.adoc["sequence points"].
 Este programa puede satisfacer la condicion establecidad, fallar o incluso link:UndefinedBehaviour.adoc#nasal-demons["nasal demons"]. Uno podria argumentar que el resultado de este programa puede ser diferente porque el orden de evaluacion de los incrementos es diferente, pero eso no explicaria, el resultado de "12", cuando ninguno de los incrementos puede ver el valor escrito por el otro. Esta es una preocupación del "memory model": ¿Que valor debe ser visto por cada incremento, y que deberia ser almacenado?
 
-image::slides/JMM-Slide06.png[]
+image::images/jmm/006.png[]
 
-Either way, when presented with a challenge of implementing the particular language, we can go one of two ways: interpretation, or compilation of abstract machine to the target hardware. Both interpretation and compilation are connected via https://en.wikipedia.org/wiki/Partial_evaluation#Futamura_projections[Futamura Projections] anyway.
+De cualquier manera, si nos presentan el desafio de implementar un lenguaje, podemos optar por "Interpretacion" o "Compilacion", independientemente de nuestra eleccion ambos caminos estan conectados por link:FutamuraProjections.adoc[Futamura Projections].
 
 The practical takeaway is that both interpreter and compiler are tasked with emulating the abstract machine. Compilers are usually blamed for screwing up the memory models and multi-threaded programs, but interpreters are not immune, either. Failing to run an interpreter to the abstract machine spec may result in memory model violations. The simplest example: cache the field values over volatile reads in an interpreter, and you are done for. This takes us to an interesting trade-off.
 
-image::slides/JMM-Slide07.png[]
+image::images/jmm/007.png[]
 
 The very reason why programming languages still require smart developers is the absence of hypersmart compilers. "Hyper" is not a overstatement: some of the problems in compiler engineering are undecidable, that is, non-solvable even in theory, let alone in practice. Other interesting problems may be theoretically feasible, but not practical. Therefore, to make practical (optimizing) compilers possible, we need to cause some inconvenience in the language. The same goes for hardware, since (at least for Turing machines) it is just the algorithms in silica.
 
-image::slides/JMM-Slide08.png[]
+image::images/jmm/008.png[]
 
 To elaborate on this thought, the rest of the talk is structured as follows.
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 == Parte I. Acceso atomico (Access Atomicity)
 Acceso atomico

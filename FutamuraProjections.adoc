@@ -1,0 +1,11 @@
+= Futamura Projections
+
+_Extraido del blog http://blog.sigfpe.com/2009/05/three-projections-of-doctor-futamura.html[A Neighborhood of Infinity]_
+
+== Introduccion
+
+El Doctor Yoshihiko Futamura definio tres proyecciones, las cuales son una secuencia de aplicaciones de una tecnica de programacion llamada "partial evaluation" o "specialisation", cada una mas compleja que la anterior. Dado que no solo los programadores deberian tener toda la diversion
+
+The Three Projections of Futamura are a sequence of applications of a programming technique called 'partial evaluation' or 'specialisation', each one more mind-bending than the previous one. But it shouldn't be programmers who have all the fun. So I'm going to try to explain the three projections in a way that non-programmers can maybe understand too. But whether you're a programmer or not, this kind of self-referential reasoning can hurt your brain. At least it hurts mine. But it's a good pain, right?
+
+So rather than talk about computer programs, I'll talk about machines of the mechanical variety. A bit like computer programs, these machines will have some kind of slot for inputting stuff, and some kind of slot where output will come out. But unlike computer programs, I'll be able to draw pictures of them to show what I'm talking about. I'll also assume these machines have access to an infinite supply of raw materials for manufacturing purposes and I'll also assume that these machines can replicate stuff - because in a computer we can freely make copies of data, until we run out of memory at least.
