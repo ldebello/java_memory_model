@@ -1,36 +1,113 @@
 = Futamura Projections
 
-_Extraido del blog http://blog.sigfpe.com/2009/05/three-projections-of-doctor-futamura.html[A Neighborhood of Infinity]_
+_Extraido del blog http://elmanantialdebits.blogspot.com.ar/2010/04/las-proyecciones-de-futamura.html[EL MANANTIAL DE BITS]_
 
-== Introduccion
+== Parcialización
 
-El Doctor Yoshihiko Futamura definio tres proyecciones, las cuales son una secuencia de aplicaciones de una tecnica de programacion llamada "partial evaluation" o "specialisation", cada una mas compleja que la anterior. Dado que no solo los programadores deberian tener toda la diversion, vamos a intentar explicar las tres proyecciones de una forma que cualquier persona podria entenderlo. De todos modos este tipo de rasonacimiento puede lastimar tu cerebro al menos lastimo el mio, pero es un lindo dolor, no?
+En los lenguajes funcionales acostumbramos a escribir las funciones currificadas. No se escribe algo como
 
-En lugar de hablar de programas de computadoras vamos a hablar de simples maquinas. Estas maquinas tendran algunos slots usados como input y otro slot como output, vamos a asumir que estas maquinas pueden replicar objetos y que tenemos materiales infinitos, en una computadora podemos hacer copias de datos hasta que nos quedamos sin memoria.
+* f(x,y)
 
-== Acuñacion de monedas (Minting coins)
+que sería una función con tipo
 
-Un ejemplo simple de una maquina que tiene un solo slot de input para monedas en blanco y un slot de output que emite monedas con una denominacion especifica:
+* f:: X × Y → R
 
-image::images/futamura/001.png[]
+Este tipo significa que f es una función que toma un par de árgumentos y devuelve un resultado. De hecho, se usa el tipo producto de X por Y (producto cartesiano).
 
-Esta es una maquina dedica para emitir monedas de $1. Podemos imaginar que internamente marca la moneda con la denominacion correspondiente.
+Lo que se suele escribir es
 
-Seria mas interesante si pudieramos crear una maquina nueva que tenga un slot adicional que nos permita ingresar la denominacion de la moneda. Si proveemos distintas denominaciones podriamos generar diferentes monedas con una sola maquina.
+* fxy
 
-image::images/futamura/002.png[]
+que significa realmente
 
-La misma maquina podria producir dolares, yen o reales. Podemos imaginar que esta maquina funciona tomando la denominacion e imprimiendola en la moneda https://es.wikipedia.org/wiki/Control_numérico[CNC style]. Este tipo de maquinas son llamadas interpretes, esta interpreta las instrucciones y produce el resultado.
+* f(x)(y)
 
-El interprete tiene una ventaja sobre la maquina dedica, porque podemos hacer crear una moneda de cualquier denominacion, pero su velocidad sera menor. La maquina dedica puede imprimir la moneda en una sola pasada, pero el interprete no puede hacer lo mismo ya que primero debe procesar el input de la denominacion. ¿Existe alguna manera de tener ambos beneficios? Podriamos hacer lo siguiente: Tomar la denominacion de la moneda, crear negativos de esas denominacion y emitir una maquina dedica que imprime monedas con esa denominacion. Este tipo de maquinas es llamada compilador, esta toma un conjunto de instrucciones y en lugar de ejecutarlas una por una, genera una nueva maquina para ejecutarlas. Un ejemplo seria:
+y cuyo tipo es
 
-image::images/futamura/003.png[]
+* f:: X → (Y → R)
 
-So here are the two important concepts so far:
+Este tipo indica que f es una función que toma un argumento y devuelve otra función que toma el siguiente argumento y que, por fin, devuelve el resultado.
 
-Interpreters: these take descriptions or instructions and use them to make the thing described.
-Compilers: these take descriptions or instructions and use them to make a machine dedicated to making the thing described. The process of making such a machine from a set of instructions is known as compiling.
+A pasar del primer caso al segundo se llama https://es.wikipedia.org/wiki/Currificación[currificar] la función.
 
-The Projections of Doctor Futamura help make clear the relationship between these kinds of things.
+Si en vez de escribir
 
-== Specialisation
+* fxy
+
+que nos da el resultado, escribimos
+
+* fx
+
+obtenemos una función que toma un argumento "y" y devuelve el resultado. El tipo de f x es
+
+* fx:: Y → R
+
+A esta función se la llama una parcialización o una evaluación parcial de f. De cierta forma, lo que hacemos es calcular un caso particular de f para cuando sabemos el valor x.
+
+== Parcialización explícita
+
+Generalmente parcializamos cuando no introducimos todos los argumentos que la función requiere. Esta parcialización se realiza de forma automática. En parte gracias a la nomenclatura. Sin embargo, esto no suele ser así a la hora de computar realmente. Lo que se suele hacer es usar una función auxiliar que llamaremos "mix" y que obtiene la parcialización de una función con su primer argumento.
+
+En notación matemática:
+
+* f(x,y)=r
+
+* mix(f,x)=p
+
+* p(y)=r
+
+* mix(f,x)(y)=r
+
+De esta forma hemos hecho explícita la parcialización de la función f.
+
+== Turing completitud
+
+Una de las características de los modelos de computación tales como el lambda cálculo, la máquina de Turing o un ordenador, es que se pueden simular a sí mismos. Entonces decimos que ese modelo es Turing completo.
+
+Antes de nada, empezaremos viendo cómo funciona un programa cuando queremos ejecutarlo. La idea es que tenemos el programa "prog" y se lo pasamos a otro programa "interp" para que lo interprete. Generalmente también le pasamos una entrada "entrada" y el resultado es una salida.
+
+Todo esto se puede poner en notación metemática ya que, grancias a la Turing completitud, el intérprete no es más que un programa.
+
+* interp(prog,entrada)=salida
+
+== Las proyecciones de Futamura
+
+En este punto fue cuando a Futamura (por cierto, significa "dos villas") se le ocurrió parcializar. El resultado es que obtenemos una compilación del programa.
+
+* interp(prog,entrada)=mix(interp,prog)(entrada)=salida
+
+* mix(interp,prog)=compilado
+
+* compilado(entrada)=salida
+
+Esta es la primera https://en.wikipedia.org/wiki/Partial_evaluation#Futamura_projections[proyección de Futamura]: La parcialización de un intérprete y un programa es el programa compilado.
+
+Pero este buen hombre no quedó ahí, vio que ¡mix también puede parcializarse!
+
+* mix(interp,prog)(entrada)=mix(mix,interp)(prog)(entrada)=salida
+
+* mix(interp,prog)=mix(mix,interp)(prog)=compilado
+
+* mix(mix,interp)=compilador
+
+* compilador(prog)=compilado
+
+* compilado(entrada)=salida
+
+Así que mix(mix, interp) no es más que el compilador relacionado con el intérprete "interp". Esta es la segunda proyección de Futamura.
+
+Pero podemos seguir y obtener
+
+* mix(mix,interp)(prog)(entrada)=mix(mix,mix)(interp)(prog)(entrada)=salida
+
+* mix(mix,mix)(interp)=compilador
+
+* compilador(prog)=compilado
+
+* compilado(entrada)=salida
+
+Así que llegamos a la tercera y última proyección de futamura. Es un generador de compiladores que, dado un intérprete, obtiene el compilador correspondiente.
+
+* mix(mix,mix)=generador
+
+* generador(interp)=compilador
