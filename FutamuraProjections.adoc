@@ -1,6 +1,6 @@
 = Futamura Projections
 
-_Extraido del blog http://elmanantialdebits.blogspot.com.ar/2010/04/las-proyecciones-de-futamura.html[EL MANANTIAL DE BITS]_
+_Extraido del blog http://elmanantialdebits.blogspot.com.ar/2010/04/las-proyecciones-de-futamura.html[El Manantial de Bits]_
 
 == Parcialización
 
