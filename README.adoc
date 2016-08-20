@@ -40,15 +40,15 @@ image::images/jmm/006.png[]
 
 De cualquier manera, si nos presentan el desafio de implementar un lenguaje, podemos optar por "Interpretacion" o "Compilacion", independientemente de nuestra eleccion ambos caminos estan conectados por link:FutamuraProjections.adoc[Futamura Projections].
 
-The practical takeaway is that both interpreter and compiler are tasked with emulating the abstract machine. Compilers are usually blamed for screwing up the memory models and multi-threaded programs, but interpreters are not immune, either. Failing to run an interpreter to the abstract machine spec may result in memory model violations. The simplest example: cache the field values over volatile reads in an interpreter, and you are done for. This takes us to an interesting trade-off.
+La conclusión práctica es que tanto el intérprete y compilador tienen la tarea de emular una máquina abstracta. Los compiladores suelen ser acusados de arruinar los modelos de memoria y programa multithreading, pero los interpretes no son inmunes. Fallar en ejecutar un interprete para la maquina abstracta puede generar violaciones al modelo de memoria. Lo cual nos lleva a un interesante trade-off.
 
 image::images/jmm/007.png[]
 
-The very reason why programming languages still require smart developers is the absence of hypersmart compilers. "Hyper" is not a overstatement: some of the problems in compiler engineering are undecidable, that is, non-solvable even in theory, let alone in practice. Other interesting problems may be theoretically feasible, but not practical. Therefore, to make practical (optimizing) compilers possible, we need to cause some inconvenience in the language. The same goes for hardware, since (at least for Turing machines) it is just the algorithms in silica.
+La razon por la cual los lenguajes de programacion necesitan que desarrolladores habiles es la absencia de "hypersmart compilers". "Hyper" no es una exageracion: Alguno de los problemas en la creacion de compiladores no tienen solucion en la teoria y menos en la practica. Otros problemas interesantes pueden ser posibles en la teoria pero no en la practica.
 
 image::images/jmm/008.png[]
 
-To elaborate on this thought, the rest of the talk is structured as follows.
+Para más detalles sobre estos temas, el resto de la charla estara estructurada de la siguiente manera.
 
 == Parte I. Acceso atomico (Access Atomicity)
 Acceso atomico

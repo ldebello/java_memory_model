@@ -1,5 +1,5 @@
 
-description = 'JCStressTutorial'
+description = 'JCStressTestCases'
 dependencies {
     compile group: 'org.openjdk.jcstress', name: 'jcstress-core', version:'1.0-SNAPSHOT'
 }

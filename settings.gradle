@@ -1,4 +1,4 @@
 rootProject.name = 'JavaMemoryModel'
-include ':JCStressTutorial'
+include ':JCStressTestCases'
 
-project(':JCStressTutorial').projectDir = "$rootDir/JCStressTutorial" as File
+project(':JCStressTestCases').projectDir = "$rootDir/JCStressTestCases" as File
