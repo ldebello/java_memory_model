@@ -51,4 +51,17 @@ image::images/jmm/008.png[]
 Para más detalles sobre estos temas, el resto de la charla estara estructurada de la siguiente manera.
 
 == Parte I. Acceso atomico (Access Atomicity)
-Acceso atomico
+¿Qué queremos? (What Do We Want)
+
+image::images/jmm/009.png[]
+
+Una de las cosas mas simple para entender en el JMM es la garantia de acceso atomico. Para definir esto vamos a introducir un poco mas de notacion. En el ejemplo de este slide, se pueden ver una tabla con dos columnas. Esto lo podemos leer de la siguiente forma, todo lo que esta en el encabezado ya ha sido ejecutado y almacenado en memoria. Cada columna representa a un thread distinto. En este ejemplo el Thread 1 almacena algun valor "V2" en una variable global (O sea compartida por ambos threads), Thread 2 lee esta variable y comprueba si el valor es "V1" o "V2". Queremos asegurarnos que el Thread 2 solo lee valores posibles y no algun valor intermedio.
+
+¿Qué tenemos? (What Do We Have)
+
+image::images/jmm/010.png[]
+
+Esto parece un requerimiento bastante obvio para cualquier lenguaje de programacion: ¿Como esto puede no suceder? y ¿Por qué? Aca tenemos el por qué.
+
+Para asegurar atomicidad antes accesos concurrentes, necesitamos
+tener instrucciones basicas operando con un determinado tamaño, de otro modo la atomicidad es violada a nivel de instruccion: Si necesitamos separar el acceso en multiples sub-accessos, estos pueden ser intercalados con otras instrucciones. Pero incluso si tenemos operaciones para determinados tamaños, estas aun pueden no ser atomicas: @PendingTranslation for example, the atomicity guarantees for 2- and 4-byte reads are unknown for PowerPC (they are implied to be atomic).
