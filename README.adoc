@@ -65,3 +65,13 @@ Esto parece un requerimiento bastante obvio para cualquier lenguaje de programac
 
 Para asegurar atomicidad antes accesos concurrentes, necesitamos
 tener instrucciones basicas operando con un determinado tamaño, de otro modo la atomicidad es violada a nivel de instruccion: Si necesitamos separar el acceso en multiples sub-accessos, estos pueden ser intercalados con otras instrucciones. Pero incluso si tenemos operaciones para determinados tamaños, estas aun pueden no ser atomicas: @PendingTranslation for example, the atomicity guarantees for 2- and 4-byte reads are unknown for PowerPC (they are implied to be atomic).
+
+image::images/jmm/011.png[]
+
+La mayoria de las plataformas garantiza atomicidad hasta accesos de 32 bits, el JMM tiene el mismo *compromiso* y relaja los accesos de 64 bits. De todos modos hay formas de forzar atomicidad para valores de 64 bits, e.g. por medio de un lock en la lectura y escritura aunque esto tiene un costo, por lo cual una posible via de escape es utilizar *volatile* en donde se requiera de atomicidad y la VM junto con el Hardware haran todo el trabajo, sin importar el costo.
+
+image::images/jmm/012.png[]
+
+Aunque tengamos operaciones que trabajen con determinado tamaño esto no es suficiente para garantizar la atomicidad en la mayoria de los Hardware. Por ejemplo, si el acceso a los datos causa multiples transacciones a la memoria principal, la atomicidad no es garantizada, incluso cuando se ejecute una sola instruccion. Si tomamos como ejemplo x86, la atomicidad no esta garantizada si los read/write se expanden a dos lineas distintas de la cache, por que esto requiere dos transacciones a la memoria. Esto es por que en general solo los datos aligneados pueden ser leidos o escritos de forma atomica, lo que fuerza a las VMs a link:alignear los datos.adoc[alignear los datos].
+
+In this example, which is printed by JOL, we can see the long field being allocated at offset 16 from the object start. Coupled with object alignment of 8 bytes, we have the perfectly aligned long. Now, it would not violate the memory model to put long at offset 12, if we know it is not volatile, but that will only work on x86 (other platforms may violently disagree on performing misaligned accesses), and possibly with performance disadvantages.
