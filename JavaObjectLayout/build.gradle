@@ -1,0 +1,9 @@
+
+description = 'JavaObjectLayout'
+dependencies {
+    compile 'org.openjdk.jol:jol-core:0.5'
+}
+
+repositories {
+    jcenter()
+}
