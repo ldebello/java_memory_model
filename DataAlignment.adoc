@@ -14,7 +14,7 @@ However, your computer's processor does not read from and write to memory in byt
 
 image::images/data_alignment/002.jpg[]
 
-The difference between how high-level programmers think of memory and how modern processors actually work with memory raises interesting issues that this article explores.
+The difference between how high-level programmers think of memory and how modern processors actually work with memory raises interesting issues that this article explores. +
 If you don't understand and address alignment issues in your software, the following scenarios, in increasing order of severity, are all possible:
 
 * Your software will run slower.
@@ -35,11 +35,11 @@ This fits in with the naive programmer's model of how memory works: it takes the
 
 image::images/data_alignment/004.jpg[]
 
-When reading from address 0, a processor with two-byte granularity takes half the number of memory accesses as a processor with one-byte granularity. Because each memory access entails a fixed amount overhead, minimizing the number of accesses can really help performance.
-However, notice what happens when reading from address 1. Because the address doesn't fall evenly on the processor's memory access boundary, the processor has extra work to do. Such an address is known as an unaligned address. Because address 1 is unaligned, a processor with two-byte granularity must perform an extra memory access, slowing down the operation.
+When reading from address 0, a processor with two-byte granularity takes half the number of memory accesses as a processor with one-byte granularity. Because each memory access entails a fixed amount overhead, minimizing the number of accesses can really help performance. +
+However, notice what happens when reading from address 1. Because the address doesn't fall evenly on the processor's memory access boundary, the processor has extra work to do. Such an address is known as an unaligned address. Because address 1 is unaligned, a processor with two-byte granularity must perform an extra memory access, slowing down the operation. +
 Finally, examine what would happen on a processor with four-byte memory access granularity, like the 68030 or PowerPC® 601:
 
 image::images/data_alignment/005.jpg[]
 
-A processor with four-byte granularity can slurp up four bytes from an aligned address with one read. Also note that reading from an unaligned address doubles the access count.
+A processor with four-byte granularity can slurp up four bytes from an aligned address with one read. Also note that reading from an unaligned address doubles the access count. +
 Now that you understand the fundamentals behind aligned data access, you can explore some of the issues related to alignment.
