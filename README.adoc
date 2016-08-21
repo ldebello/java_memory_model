@@ -19,22 +19,31 @@ image::images/jmm/001.png[]
 
 Primero, una slide para romper el hielo. https://twitter.com/gakesson[@gakesson], *saludanos!*
 
+---
+
 image::images/jmm/002.png[]
 
 Si leemos cualquier spec acerca de un lenguaje, vamos a notar que puede ser dividad en dos partes relacionadas pero distintas. Primero, nos encontramos con una parte simple, la cual llamamos sintaxis (syntax), la cual describe como escribir programas en ese lenguaje. Segundo, la parte mas complicada es conocida como semantica (semantics), la cual describe exactamente lo que significa cada sintaxis en particular. Generalmente, las spec describen la semantica por medio del comportamiento de una https://es.wikipedia.org/wiki/Máquina_abstracta[abstract machine] que ejecuta el programa, de este modo la spec es solo una especificacion de abstract machine.
+
+---
 
 image::images/jmm/003.png[]
 
 Cuando el lenguaje posee almacenamiento (Variables, Heap Memory, etc.), la abstract machine tambien posee almacenamiento, y tenemos que definir un conjuntos de reglas acerca de como se comporta el almacenamiento. Esto es lo que llamamos "memory model". Si el lenguaje no posee almacenamiento explicito (e.g los datos son pasados en contextos de llamadas), entonces tu modelo de memoria es bastante simple. El "memory model" parece responder a una pregunta simple: ¿Que valores puede observar una instruccion read?
 
+---
+
 image::images/jmm/004.png[]
 
 En programas secuenciales, esto parece ser una pregunta sin mucho sentido, porque si nuestro programa es secuencial, cada store en la memoria viene dado con un determinado orden, y es obvio que cada "read" debe observar el ultimo "write" aplicado. Por eso solemnos cruzarnos con el concepto de "memory model" en programas mult-thread, donde esta pregunta se vuelve mas complicada de responder. Sin embargo el "memory model" tambien importa en programas secuenciales (Aunque en este caso esta inteligentemente disfrazado en la nocion de orden de evaluacion).
 
+---
+
 image::images/jmm/005.png[]
 
-Por ejemplo, el abominable ejemplo de link:UndefinedBehaviour.adoc["undefined behaviour"] en un programa "C", que utiliza algunos incremento entre los link:SequencePoint.adoc["sequence points"].
-Este programa puede satisfacer la condicion establecidad, fallar o incluso link:UndefinedBehaviour.adoc#nasal-demons["nasal demons"]. Uno podria argumentar que el resultado de este programa puede ser diferente porque el orden de evaluacion de los incrementos es diferente, pero eso no explicaria, el resultado de "12", cuando ninguno de los incrementos puede ver el valor escrito por el otro. Esta es una preocupación del "memory model": ¿Que valor debe ser visto por cada incremento, y que deberia ser almacenado?
+Por ejemplo, el abominable ejemplo de link:UndefinedBehaviour.adoc["undefined behaviour"] en un programa "C", que utiliza algunos incremento entre los link:SequencePoint.adoc["sequence points"]. Este programa puede satisfacer la condicion establecidad, fallar o incluso link:UndefinedBehaviour.adoc#nasal-demons["nasal demons"]. Uno podria argumentar que el resultado de este programa puede ser diferente porque el orden de evaluacion de los incrementos es diferente, pero eso no explicaria, el resultado de "12", cuando ninguno de los incrementos puede ver el valor escrito por el otro. Esta es una preocupación del "memory model": ¿Que valor debe ser visto por cada incremento, y que deberia ser almacenado?
+
+---
 
 image::images/jmm/006.png[]
 
@@ -42,9 +51,13 @@ De cualquier manera, si nos presentan el desafio de implementar un lenguaje, pod
 
 La conclusión práctica es que tanto el intérprete y compilador tienen la tarea de emular una máquina abstracta. Los compiladores suelen ser acusados de arruinar los modelos de memoria y programa multithreading, pero los interpretes no son inmunes. Fallar en ejecutar un interprete para la maquina abstracta puede generar violaciones al modelo de memoria. Lo cual nos lleva a un interesante trade-off.
 
+---
+
 image::images/jmm/007.png[]
 
 La razon por la cual los lenguajes de programacion necesitan que desarrolladores habiles es la absencia de "hypersmart compilers". "Hyper" no es una exageracion: Alguno de los problemas en la creacion de compiladores no tienen solucion en la teoria y menos en la practica. Otros problemas interesantes pueden ser posibles en la teoria pero no en la practica.
+
+---
 
 image::images/jmm/008.png[]
 
@@ -57,6 +70,8 @@ image::images/jmm/009.png[]
 
 Una de las cosas mas simple para entender en el JMM es la garantia de acceso atomico. Para definir esto vamos a introducir un poco mas de notacion. En el ejemplo de este slide, se pueden ver una tabla con dos columnas. Esto lo podemos leer de la siguiente forma, todo lo que esta en el encabezado ya ha sido ejecutado y almacenado en memoria. Cada columna representa a un thread distinto. En este ejemplo el Thread 1 almacena algun valor "V2" en una variable global (O sea compartida por ambos threads), Thread 2 lee esta variable y comprueba si el valor es "V1" o "V2". Queremos asegurarnos que el Thread 2 solo lee valores posibles y no algun valor intermedio.
 
+---
+
 ¿Qué tenemos? (What Do We Have)
 
 image::images/jmm/010.png[]
@@ -66,9 +81,13 @@ Esto parece un requerimiento bastante obvio para cualquier lenguaje de programac
 Para asegurar atomicidad antes accesos concurrentes, necesitamos
 tener instrucciones basicas operando con un determinado tamaño, de otro modo la atomicidad es violada a nivel de instruccion: Si necesitamos separar el acceso en multiples sub-accessos, estos pueden ser intercalados con otras instrucciones. Pero incluso si tenemos operaciones para determinados tamaños, estas aun pueden no ser atomicas: @PendingTranslation for example, the atomicity guarantees for 2- and 4-byte reads are unknown for PowerPC (they are implied to be atomic).
 
+---
+
 image::images/jmm/011.png[]
 
 La mayoria de las plataformas garantiza atomicidad hasta accesos de 32 bits, el JMM tiene el mismo *compromiso* y relaja los accesos de 64 bits. De todos modos hay formas de forzar atomicidad para valores de 64 bits, e.g. por medio de un lock en la lectura y escritura aunque esto tiene un costo, por lo cual una posible via de escape es utilizar *volatile* en donde se requiera de atomicidad y la VM junto con el Hardware haran todo el trabajo, sin importar el costo.
+
+---
 
 image::images/jmm/012.png[]
 
