@@ -95,8 +95,12 @@ image::images/jmm/012.png[]
 
 Aunque tengamos operaciones que trabajen con determinado tamaño esto no es suficiente para garantizar la atomicidad en la mayoria de los Hardware. Por ejemplo, si el acceso a los datos causa multiples transacciones a la memoria principal, la atomicidad no es garantizada, incluso cuando se ejecute una sola instruccion. Si tomamos como ejemplo x86, la atomicidad no esta garantizada si los read/write se expanden a dos lineas distintas de la cache, por que esto requiere dos transacciones a la memoria. Esto es por que en general solo los datos aligneados pueden ser leidos o escritos de forma atomica, lo que fuerza a las VMs a link:DataAlignment.adoc[alignear los datos].
 
-En este ejemplo que fue generado con http://openjdk.java.net/projects/code-tools/jol/[JOL], podemos ver
+En este ejemplo que fue generado con http://openjdk.java.net/projects/code-tools/jol/[JOL], podemos ver que el field de tipo long esta posicionado desde el offset 16, esto se debe a que los objetos se alinean de 8 bytes, podriamos posicionar el long desde el offset 12 pero si hicieramos eso, el funcionamiento seria dependiende de la plataforma y algunas de ellas no aceptan accesos a datos no alineados y en otros casos pueden haber problemas de performance.
 
-we can see the long field being allocated at offset 16 from the object start. Coupled with object alignment of 8 bytes, we have the perfectly aligned long. Now, it would not violate the memory model to put long at offset 12, if we know it is not volatile, but that will only work on x86 (other platforms may violently disagree on performing misaligned accesses), and possibly with performance disadvantages.
+---
 
-In this example, which is printed by http://openjdk.java.net/projects/code-tools/jol/[JOL], we can see the long field being allocated at offset 16 from the object start. Coupled with object alignment of 8 bytes, we have the perfectly aligned long. Now, it would not violate the memory model to put long at offset 12, if we know it is not volatile, but that will only work on x86 (other platforms may violently disagree on performing misaligned accesses), and possibly with performance disadvantages.
+image::images/jmm/013.png[]
+
+Verifiquemos nuestro entendimiento con una simple pregunta. ¿Es posible leer algun valor intermedio? dado que Java utiliza la link:BinaryRepresentation.adoc[representacion binaria] complemento a dos, asignar -1L es equivalente a asignar 1 a todos los bits en el long.
+
+*Respuesta*: Esto funciona de forma correcta porque la clase AtomicLong contiene un field long el cual es volatile.
