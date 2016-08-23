@@ -2,11 +2,12 @@
 
 Tenemos varias formas de representar numeros positivos y negativos en binario.
 
-- Signo y Magnitud  (Signed Magnitude)
-- Complemento a uno (One's Complement)
-- Complemento a dos (Two's Complement)
+* Signo y Magnitud  (Signed Magnitude)
+* Complemento a uno (One's Complement)
+* Complemento a dos (Two's Complement)
 
-1. Signo y Magnitud (Signed Magnitude)
+
+== Signo y Magnitud (Signed Magnitude)
 
 Esta tecnica utiliza el bit mas significante para representar el signo, y el resto es utilizado para el valor. El 0 representa un numero positivo y el 1 representa un numero negativo:
 
@@ -17,7 +18,7 @@ Esta tecnica utiliza el bit mas significante para representar el signo, y el res
 
 Esta representacion es simple, pero tiene algunos problemas como por ejemplo no poder sumar numeros binarios de forma simple y el numero 0 tiene dos representaciones binarias, 100...0 and 0....0.
 
-2. Complemento a uno (One's Complement)
+== Complemento a uno (One's Complement)
 
 En esta representacion invertimos todos los bits para encontar su correspondiente numero negativo
 
@@ -28,7 +29,7 @@ En esta representacion invertimos todos los bits para encontar su correspondient
 
 El problema de esta representacion es que aun existen dos representaciones para el 0, 00..0 and 11..1.
 
-3. Complemento a dos (Two's Complement)
+== Complemento a dos (Two's Complement)
 
 En esta representacion invertimos todos los bits y luego agregamos otro bit. Agregando este bit adicional resuelve el problema de tener dos representaciones binarias para el 0.
 
