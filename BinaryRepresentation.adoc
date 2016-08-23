@@ -1,4 +1,4 @@
-== Binary Representation
+= Binary Representation
 
 Tenemos varias formas de representar numeros positivos y negativos en binario.
 

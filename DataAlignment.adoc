@@ -1,10 +1,13 @@
-== Data Alignment
+= Data Alignment
 
 _Extraido de http://www.ibm.com/developerworks/library/pa-dalign/[IBM developerWorks]_
 
-Data alignment is an important issue for all programmers who directly use memory. Data alignment affects how well your software performs, and even if your software runs at all. As this article illustrates, understanding the nature of alignment can also explain some of the "weird" behaviors of some processors.
+Cuando hablamos de "Data alignment" nos referimos a como los datos estaran, alineados en la memoria. Nuestro software puede ser impactado por como esten alineado los datos o hasta llegar a no funcionar.
 
 == Memory access granularity
+
+Los programadores están condicionados a pensar en la memoria como una simple matriz de bytes. Entre C y sus descendientes, char * es ubicuo en el sentido de "un bloque de memoria", e incluso Java ™ tiene su byte [] para representar el tipo de memoria en bruto.
+
 
 Programmers are conditioned to think of memory as a simple array of bytes. Among C and its descendants, char* is ubiquitous as meaning "a block of memory", and even Java™ has its byte[] type to represent raw memory.
 
