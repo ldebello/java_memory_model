@@ -1,4 +1,4 @@
-= Data Alignment
+= Alineamiento (Data Alignment)
 
 _Extraido de http://www.ibm.com/developerworks/library/pa-dalign/[IBM developerWorks]_
 
@@ -6,43 +6,64 @@ Cuando hablamos de "Data alignment" nos referimos a como los datos estaran, alin
 
 == Memory access granularity
 
-Los programadores están condicionados a pensar en la memoria como una simple matriz de bytes. Entre C y sus descendientes, char * es ubicuo en el sentido de "un bloque de memoria", e incluso Java ™ tiene su byte [] para representar el tipo de memoria en bruto.
-
-
-Programmers are conditioned to think of memory as a simple array of bytes. Among C and its descendants, char* is ubiquitous as meaning "a block of memory", and even Java™ has its byte[] type to represent raw memory.
+Una de las formas en la cual los programadores piensan en la memoria es como un vector de bytes. Desde C y sus descendientes, char* representa "un bloque de memoria", en Java contamos con byte[] para representar una cadena de bytes.
 
 image::images/data_alignment/001.jpg[]
 
-However, your computer's processor does not read from and write to memory in byte-sized chunks. Instead, it accesses memory in two-, four-, eight- 16- or even 32-byte chunks. We'll call the size in which a processor accesses memory its memory access granularity.
+Sin embargo, las computadoras no leen y escriben en la memoria byte x byte, sino que acceden a la memoria en bloque (2, 4, 8, 16, 32 bytes). El tamaño del bloque es conocido como "memory access granularity"
 
 image::images/data_alignment/002.jpg[]
 
-The difference between how high-level programmers think of memory and how modern processors actually work with memory raises interesting issues that this article explores. +
-If you don't understand and address alignment issues in your software, the following scenarios, in increasing order of severity, are all possible:
+La diferencia entre como los programadores piensan en la memoria y como los procesadores modernos trabajan con la memoria, puede generar diveros problemas contemplados en este articulo.
+Algunos problemas tipicos que podemos enfrentar al manejar datos desalineados:
 
-* Your software will run slower.
-* Your application will lock up.
-* Your operating system will crash.
-* Your software will silently fail, yielding incorrect results.
+* Performance issue
+* La aplicacion se puede frizar
+* El sistema operativo se puede frizar
+* La aplicacion puede fallar y generar resultados incorrectos
 
 ---
 
-== Alignment fundamentals
+== Fundamentos (Alignment fundamentals)
 
-To illustrate the principles behind alignment, examine a constant task, and how it's affected by a processor's memory access granularity. The task is simple: first read four bytes from address 0 into the processor's register. Then read four bytes from address 1 into the same register. +
-First examine what would happen on a processor with a one-byte memory access granularity:
+Para ilustrar los principios detras de esto, podemos examinar algunos ejemplos y como distintos
+tamaños afectan el comportamentieto.
+
+Leer 4 bytes desde la direccion 0 y almacenar esto en un registro, luego vamos a leer 4 bytes pero desde la direccion 1. +
+Veamos que sucede si el "memory access granularity" es de 1 byte
 
 image::images/data_alignment/003.jpg[]
 
-This fits in with the naive programmer's model of how memory works: it takes the same four memory accesses to read from address 0 as it does from address 1. Now see what would happen on a processor with two-byte granularity, like the original 68000:
+Esto se ajusta a nuestra ingenua idea de como la memoria funciona: Podemos ver que necesitamos de 4 acceso a la memoria en cualquiera de los dos casos: Ahora veamos que pasa si el "memory access granularity" es de 2 bytes como el original 68000:
 
 image::images/data_alignment/004.jpg[]
 
-When reading from address 0, a processor with two-byte granularity takes half the number of memory accesses as a processor with one-byte granularity. Because each memory access entails a fixed amount overhead, minimizing the number of accesses can really help performance. +
-However, notice what happens when reading from address 1. Because the address doesn't fall evenly on the processor's memory access boundary, the processor has extra work to do. Such an address is known as an unaligned address. Because address 1 is unaligned, a processor with two-byte granularity must perform an extra memory access, slowing down the operation. +
-Finally, examine what would happen on a processor with four-byte memory access granularity, like the 68030 or PowerPC® 601:
+Cuando leemos desde la direccion 0, el procesador necesita la mitad de acceso a la memoria, pero cuando leemos desde la direccion 1, los datos estan desalineados, entonces se deben procesar acceso innecesarios. +
+Por ultimo vamos a analizar que pasa con un procesador con 4 bytes de "memory access granularity" como el 68030 o PowerPC® 601:
 
 image::images/data_alignment/005.jpg[]
 
-A processor with four-byte granularity can slurp up four bytes from an aligned address with one read. Also note that reading from an unaligned address doubles the access count. +
-Now that you understand the fundamentals behind aligned data access, you can explore some of the issues related to alignment.
+Un procesador con 4 bytes de granularidad puede obtener 4 bytes desde una direccion alineada con un solo acceso. Tambien debemos notar que acceder desde una direccion no alineada duplica el numero de accesos. +
+Ahora que revisamos los fundamentos basicos detras del alineamineto de datos podemos explorar otros problemas relacionados con esto.
+
+---
+
+== Lazy processors
+
+Un procesador tiene que aplicar algunos trucos a la hora de acceder a datos no alineados. Volviendo al ejemplo donde leemos 4 bytes desde la direccion 1 con granularidad de 4 bytes, esto es lo que sucede:
+
+image::images/data_alignment/006.jpg[]
+
+El procesador lee el primer chunck de 4 bytes, dado que estamos leyendo desde una direccion no alineada debemos remover los bytes que no necesitamos de este chunk. Luego lee el segundo chunk y debe remover los bytes no deseados del final, luego se hace un merge entre estos dos chunks y se almacena en un registro. Esto es mucho trabajo.
+
+Algunos procesadores no estan dispuestos a hacer todo ese trabajo por nosotros.
+
+El original 68000 era un procesador con granularidad de 2 bytes y no disponia de la capacidad para leer direccion no alineadas, por lo cual frente a esta situacion el procesador arrojaba una excepcion. El procesador original de Mac OS no maneja esta operacion y ni siquiera arrojaba una excepcion, y normalmente obligaba al usuario a reinicar la maquina. Ouch.
+
+Procesadores mas modernos en la serie 680x0 como el 68020, manejaban esto y realizaban el trabajo necesario por nosotros. Esto explica porque algunos software viejos funcionaban en la 68020 pero no en 68000. Esto tambien explica por que, antes algunos developers de Mac inicializaban punteros con direcciones impares, en la Mac original si el puntero era accedido sin ser reasignado a una direccion valida, automicatement se caia en el debugger, y en este estado se podia analizar el stack de llamadas y descubrir el problema.
+
+Todos los procesadores tienen un numero finitos de transistores para realizar el trabajo. Soportar accesos a datos desalineados reduce el numero de transistores para otras tareas, en lugar agregar mas funcionalidad o de hacer trabajar mas rapido al procesador, deben cumplir otras funciones. Un ejemplo de un procesador el cual prefirio sacrificar el soporte para datos alineados y hacer mas rapido su trabajo es MIPS.
+
+PowerPC toma una enfoque hibrido. Cada procesador PowerPC hasta la fecha tiene soporte a nivel hardware para acceso a datos desalineados de 32 bit. De esta forma igual sufrimos una penalizacion por este acceso pero esta es menor.
+
+Por otro lado, los procesadores modernos PowerPC no poseen soporte a nivel de hardware para acceso a datos desalineados de 64 bits. Cuando se le solicita cargar un numero de punto flotante desde la memoria, este arroja una excepcion y el software sera el encargado de este acceso a datos, realizar alineamiento por medio de software es mucho mas lento que a nivel de hardware
