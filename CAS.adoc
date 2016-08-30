@@ -12,11 +12,11 @@ La operacion de CAS tiene 3 parametros:
 
 Revisemos esto con un ejemplo.
 
-1. El thread 1 y 2 quieren incrementar el valor en V (Valor actual 10) y incrementarlo a 11.
+- El thread 1 y 2 quieren incrementar el valor en V (Valor actual 10) y incrementarlo a 11.
 
 V = 10, A = 0, B = 0
 
-2. Ahora el thread 1 viene primero y compara el valor V con el valor leido anteriormente
+- Ahora el thread 1 viene primero y compara el valor V con el valor leido anteriormente
 
 V = 10, A = 10, B = 11
 
@@ -30,7 +30,7 @@ ELSE
 
 Como se puede observar el valor de V sera 11
 
-3. El thread 2 llega e intenta la misma operacion
+- El thread 2 llega e intenta la misma operacion
 
 V = 11, A = 10, B = 11
 
@@ -42,7 +42,7 @@ ELSE
 	RETURN V
 ----
 
-4. En este caso el valor de V no es igual al de A entonces la operacion falla. Dado que el thread 2 ve que no pudo realizar la operacion, vuelve a intentarlo con nuevos valores
+- En este caso el valor de V no es igual al de A entonces la operacion falla. Dado que el thread 2 ve que no pudo realizar la operacion, vuelve a intentarlo con nuevos valores
 
 V = 11, A = 11, B = 12
 
