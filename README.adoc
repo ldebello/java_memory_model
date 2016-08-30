@@ -66,7 +66,8 @@ Para más detalles sobre estos temas, el resto de la charla estara estructurada 
 ---
 
 == Parte I. Acceso atomico (Access Atomicity)
-¿Qué queremos? (What Do We Want)
+
+=== ¿Qué queremos? (What Do We Want)
 
 image::images/jmm/009.png[]
 
@@ -74,7 +75,7 @@ Una de las cosas mas simple para entender en el JMM es la garantia de acceso ato
 
 ---
 
-¿Qué tenemos? (What Do We Have)
+=== ¿Qué tenemos? (What Do We Have)
 
 image::images/jmm/010.png[]
 
@@ -99,7 +100,7 @@ En este ejemplo que fue generado con http://openjdk.java.net/projects/code-tools
 
 ---
 
-== Test Your Understanding
+=== Probando nuestro entendimiento (Test Your Understanding)
 
 image::images/jmm/013.png[]
 
@@ -109,9 +110,7 @@ Verifiquemos nuestro entendimiento con una simple pregunta. ¿Es posible leer al
 
 ---
 
-== Test Your Understanding
-
-Value Types and C/C++
+=== Value Types and C/C++
 
 image::images/jmm/014.png[]
 
@@ -123,7 +122,7 @@ In this example, C++ follows C compatibility by supporting structs. C++11 additi
 
 ---
 
-== JMM Updates
+=== JMM Updates
 
 @PendingTranslation This section covers the atomicity considerations for the updated Java Memory Model. See a more-thorough explanation in a separate post.
 
