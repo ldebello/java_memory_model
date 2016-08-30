@@ -157,3 +157,5 @@ image::images/jmm/018.png[]
 ---
 
 == Part II. Word Tearing
+
+=== ¿Qué queremos? (What Do We Want)
