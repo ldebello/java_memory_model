@@ -114,7 +114,9 @@ Verifiquemos nuestro entendimiento con una simple pregunta. ¿Es posible leer al
 
 image::images/jmm/014.png[]
 
-@PendingTranslation In Java, we are "lucky" to have the built-in types of small widths. In other languages which provide value types, the type width is arbitrary, which presents interesting challenges for the memory model.
+En Java, somos "afortunados" de tener algunos tipos built-in que tienen un tamaño pequeño. En otros lenguajes donde el tamaño es arbitrario, esto presenta algunos desafios interesantes para el modelo de memoria.
+
+En este ejemplo, C++ es compatible con C soportando estructuras. C++11 adicionalmente soporta std::atomic, lo cual requiere acceso atomico para cada POD (Plain Old Data). Si nosotros definimos el ejemplo del slide la implementacion es forzada a manejar accesos de escritura y lectura de forma atomica para 104-bytes. Dado que no hay instrucciones que permitan acceso atomico para ese tamaño la implementacion debe recurrir a utilizar link:CAS.adoc[CAS], locking o algo mas.
 
 In this example, C++ follows C compatibility by supporting structs. C++11 additionally supports std::atomic, which requires access atomicity for every Plain Old Data (POD) type T. So, if we do a trick like this in C++11, the implementations are forced to deal with atomically writing and reading the 104-byte memory blocks. There are no machine instructions which can guarantee atomicity at these widths, so implementation should resort to either CAS-ing, or locking, or something else.
 

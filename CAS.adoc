@@ -1,0 +1,51 @@
+== Compare and Swap Algorithm
+
+Este algoritmo compara el contenido de una posicion de memoria contra un valor dado, si los valores son los mismo modifica el contenido con un nuevo valor. Esto es realizado como una operacion atomica. La atomicidad garantiza que el nuevo valor fue calculado en base a informacion actualizada. Si el valor fue actualizado por otro thread, la escritura fallara. El resultado de la operacion debe indicar si la operacion realizo la substitución; esto puede ser indicado por medio de un valor booleano en la respuesta.
+
+La operacion de CAS tiene 3 parametros:
+
+* Una ubicacion de memoria donde debemos reemplazar el valor
+* Valor anterior que fue leido por el thread
+* Valor nuevo que debe sobrrescribir el anterior
+
+*CAS dice "Yo creo que la posicion V deberia tener el valor A; Si esto se cumple entonces pongo el valor B, si esto no se cumple aviso que no se cumplio la substitución". CAS es un locking optimista ya que continua con el update con la esperanza de poder realizarlo, y puede detectar si algun thread actualizo el valor.*
+
+Revisemos esto con un ejemplo.
+
+1. El thread 1 y 2 quieren incrementar el valor en V (Valor actual 10) y incrementarlo a 11.
+
+V = 10, A = 0, B = 0
+
+2. Ahora el thread 1 viene primero y compara el valor V con el valor leido anteriormente
+
+V = 10, A = 10, B = 11
+
+----
+IF (A = V) THEN
+   	V = B
+ELSE
+	Operation Failed
+	RETURN V
+----
+
+Como se puede observar el valor de V sera 11
+
+3. El thread 2 llega e intenta la misma operacion
+
+V = 11, A = 10, B = 11
+
+----
+IF (A = V) THEN
+	V = B
+ELSE
+   	Operation Failed
+	RETURN V
+----
+
+4. En este caso el valor de V no es igual al de A entonces la operacion falla. Dado que el thread 2 ve que no pudo realizar la operacion, vuelve a intentarlo con nuevos valores
+
+V = 11, A = 11, B = 12
+
+Ahroa la condicion se cumple y se incrementa el valor a 12.
+
+En resumen, cuando multiples threads intentan actualizar la misma variable de forma simultanea usando CAS, uno de ellos realiza la actualizacion y el resto detecta ese cambio y vuelve a intentarlo con nuevos valores, de esta forma no hay bloqueo entre los thread y estos son libres de reintentar la operacion o de no hacer nada.
