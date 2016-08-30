@@ -124,7 +124,7 @@ In this example, C++ follows C compatibility by supporting structs. C++11 additi
 
 === JMM Updates
 
-@PendingTranslation This section covers the atomicity considerations for the updated Java Memory Model. See a more-thorough explanation in a separate post.
+@PendingTranslation This section covers the atomicity considerations for the updated Java Memory Model. See a more-thorough explanation link:AllAccessesAreAtomic.adoc[in a separate post].
 
 image::images/jmm/015.png[]
 
