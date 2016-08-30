@@ -1,4 +1,4 @@
-== Compare and Swap Algorithm
+== Compare and Swap
 
 Este algoritmo compara el contenido de una posicion de memoria contra un valor dado, si los valores son los mismo modifica el contenido con un nuevo valor. Esto es realizado como una operacion atomica. La atomicidad garantiza que el nuevo valor fue calculado en base a informacion actualizada. Si el valor fue actualizado por otro thread, la escritura fallara. El resultado de la operacion debe indicar si la operacion realizo la substitución; esto puede ser indicado por medio de un valor booleano en la respuesta.
 
