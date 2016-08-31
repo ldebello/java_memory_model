@@ -163,3 +163,19 @@ image::images/jmm/018.png[]
 image::images/jmm/019.png[]
 
 link:WordTearing.adoc[Word tearing] esta relacionado con el acceso atomico.
+
+Si dos variables son distintas, cada accion sobre ellas tambien debe ser distinta y no debe ser afectada por acciones en elementos adyacentes. ¿Como es posible que el ejemplo anterior falle? Muy simple: Si nuestro hardware no puede acceder a distintos elementos de un array, se vera forzado a leer varios elementos, modificar el elemento del monton y luego volver a escribir el monton.
+
+Si dos threads estan haciendo lo mismo en elementos separados, puede suceder que otro thread almacena sus datos, sobreescribiendo los datos almacenados por el primer thread. Esto puede y causa muchos dolores de cabezas si no estamos conscientes de este posible comportamiento y es dificil de saber sin las especificaciones del lenguaje.
+
+---
+
+=== ¿Qué tenemos? (What Do We Have)
+
+image::images/jmm/020.png[]
+
+Si nosotros queremos prohibir word tearing, necesitamos soporte para acceso de un determinado tamaño. En el caso mas simple de un boolean[] o un grupo de fields, no se puede tener un acceso de lectura a un unico bit en la mayoria de los hardware, dado que la minima granularidad usualmente es un byte.
+
+---
+
+image::images/jmm/021.png[]
