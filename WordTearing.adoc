@@ -1,0 +1,4 @@
+== Word Tearing
+
+Una consideracion importante cuando se implementa una JVM es que cada campo y elemento en un array es considerado distinto; Si actualizamos un campo o elemento no debe interferir con lecturas o actualizaciones en otro campo o elemento. En particular cuando dos threads que actualizan elementos adyacentes de un array de bytes estos no deben interferir entre si ni tampoco debe ser necesario ningun tipo de sincronizacion para asegurar consistencia secuencial. +
+Algunos procesadores no proveen la habilidad para escribir un unico byte. Por lo cual seria ilegal implementar una actualizacion en un byte array por medio de una lectura completa de una palabra (word), actualizando el byte indicado y luego volviendo a escribir toda la palabra. Este problema es tambien conocido como "word tearing", en los procesadores que no pueden actualizar un byte de forma aislada se deben utlizarar otras tecnicas.

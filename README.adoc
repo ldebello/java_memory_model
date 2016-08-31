@@ -159,3 +159,7 @@ image::images/jmm/018.png[]
 == Part II. Word Tearing
 
 === ¿Qué queremos? (What Do We Want)
+
+image::images/jmm/019.png[]
+
+link:WordTearing.adoc[Word tearing] esta relacionado con el acceso atomico.
