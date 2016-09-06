@@ -179,3 +179,49 @@ Si nosotros queremos prohibir word tearing, necesitamos soporte para acceso de u
 ---
 
 image::images/jmm/021.png[]
+
+Sorprendentemente, hoy en dia no muchos programadores conocen sobre word tearing.Tiempo atras la mayoría de los programadores estaban familiarizado con esto, y comprendian el sufrimiento de perseguir un error de este tipo.
+
+Por lo tanto, Java decidio ser un lenguaje "amigable" y prohibir este tipo de problemas. Bill Pugh (Creado de FindBugs y lider de JMM JSR 133) http://www.cs.umd.edu/~pugh/java/memoryModel/archive/0978.html[fue bastante claro] acerca de esto. Perseguir un problema de word-tearing en C++ NO ES DIVERTIDO.
+
+Este requerimiento parece simple de implementar con el hardware actual: El unico tipo de dato con el cual debemos tener cuidado es el boolean por que tal vez queremos tomar un byte entero en lugar de un solo bit. Por supuesto tambien debemos manejar posibles optimizaciones del compilador, como almacenar varios read y write en datos adjacentes.
+
+---
+
+image::images/jmm/022.png[]
+
+Muchas gente busca el rango de los primitivos en la documentacion con el objetivo de inferir la representacion de estos datos. Aunque lo unico que podemos inferir es el minimo ancho usado para este tipo, supongamos que usamos 2^64 para el tipo long, lo cual no implica que se usen 8 bytes para el long, sino que en principio puedo usar 128 bytes, siempre y cuano esto sea practico por algun motivo.
+
+Sin embargo la gran mayoria ajusta su representacion a los valores de dominio sin malgastar el espacio. La unica excepcion es boolean. Java Object Layout(JOL) es una herramienta que nos permite conocer los tamaños asignados, en la slide podemos ver un ejemplo. El orden de los valores es: referencias, boolean, byte, short, char, int,float, long y double.
+
+---
+
+image::images/jmm/023.png[]
+
+*Respuesta*: Cualquiera de los valores (true, true), (false, true), (true, false) es posible porque BitSet almacena los valores en un long[] y utiliza mascaras de bits para acceder a un bit particular. Esta tecnica rompe las garanticas de word-tearing, pero el problema es de la implementacion. Los Javadocs de BitSet dicen que no es thread-safe, podemos decir que este es un ejemplo artificial.
+
+---
+
+=== Layout Control and C/C++
+
+image::images/jmm/024.png[]
+
+Algunas personas quieren tener control sobre el layout de memoria, para tener un mejor footprint en casos bordes y/o mejor performance. Pero en un lenguaje que permite un layout arbitrario de sus variables, no se puede prohibir el word tearing porque nosotros deberiamos pagar el precio de esto, como en el ejemplo.
+
+No hay instrucciones maquinas que puedan escribir 7 bits, o leer 3 bytes en un sola pasada, entonces las implementaciones deberian ser creativas si ellos quieren evitar word-tearing. C/C++11 permite usar esta potente herramienta, pero nos dice que una vez que empecemos a usarla estaremos por nuestra cuenta.
+
+---
+
+image::images/jmm/025.png[]
+
+Nadie cuestiona si word-tearing debe permanecer prohibido.
+
+---
+
+== Parte III. SC-DRF (Sequential Consistency - Data Race Free)
+
+=== ¿Qué queremos? (What Do We Want)
+
+image::images/jmm/026.png[]
+
+Now we are getting to the most interesting part of a memory model: reasoning about program reads at large. It would be natural to think that programs are executing their statements in some global order, sometimes switching between the threads. This is a really simple model, and Lamport has defined it for us already: sequential consistency.
