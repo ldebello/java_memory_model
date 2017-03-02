@@ -156,7 +156,7 @@ image::images/jmm/018.png[]
 
 ---
 
-== Part II. Word Tearing
+== Parte II. Word Tearing
 
 === ¿Qué queremos? (What Do We Want)
 
@@ -224,4 +224,249 @@ Nadie cuestiona si word-tearing debe permanecer prohibido.
 
 image::images/jmm/026.png[]
 
-Now we are getting to the most interesting part of a memory model: reasoning about program reads at large. It would be natural to think that programs are executing their statements in some global order, sometimes switching between the threads. This is a really simple model, and Lamport has defined it for us already: sequential consistency.
+Ahora comenzaremos a revisar una de las partes más interesante del modelo de memoria.Sería lógico que pensemos que los programas ejecutan sus sentencias en un orden global, en donde hay algun switching entre los threads; Podemos ver esto como un modelo muy simple el cual Lamport lo definio como sequential consistency.
+
+---
+
+image::images/jmm/027.png[]
+
+Sequential consistency no quiere decir que las operaciones fueron ejecutadas en un orden total particular!. Es importante que el resultado sea indistinguible de alguna otra ejecuccion con otro orden. Estas ejecuciones se llaman "Sequentially Consistent Executions", y los resultados que obssevamos son llamados "Sequentially Consistent Results"
+
+---
+
+image::images/jmm/028.png[]
+
+Aparentemente SC nos da la oportunidad de optimizar el codigo. Dado que no estamos restringidos por ningun orden total de ejecucion, solo necesitamos que el resultado sea el mismo y asi podremos hacer distintas optimizaciones. Si tomamos el ejemplo de la imagen podemos ver que la transformacion que realizamos no rompe "Sequentially Consistent", por lo tanto podemos decir que hay SC execution entre el programa original y el optimizado dado que que el resultado es el mismo. (Asumiendo que nadie esta pensando en los valores de a y b)
+
+Ademas SC nos permite reducir el numero de posibles de ejecuciones. Si llevamos esto al extremo, nosotros somos libres de seleccionar un orden simple y utilizar ese.
+
+---
+
+=== ¿Qué tenemos? (What Do We Have)
+
+image::images/jmm/029.png[]
+
+Sin embargo, la optimizacion sobre SC esta sobrevalorada. Debemos notar que los optimizadores de compiladores ,ni hablar del hardware, solo se preocupan del flujo de instrucciones. Entonces si tenemos dos operaciones de read, podemos reordenarlas y mantener SC?
+
+---
+
+image::images/jmm/030.png[]
+
+Resulta que no podemos. Debido a que si otra parte de nuestro programa persiste algun valor en "a" y "b",entonces el reordenamiento rompe SC. Efectivamente, el programa original ejecutado bajo SC solo puede emitir resultados del tipo (*, 2) or (0, *), pero si modificamos nuestro programa, aunque lo ejecutemos de forma que se cumpla el total order, puede llevar a resultados del tipo (1, 0) sorprendiendo ""baffling"" a los desarrolladores que esperan SC de su codigo.
+
+---
+
+image::images/jmm/031.png[]
+
+Podemos notar que es muy dificil ver si una simple transformacion es posible ""plausible"", dado que se necesita un detallado analisis, el cual no escala para programas reales. En teoria, podemos tener un "Smart Global Optimizer" (GMO) que puede realizar este analisis. Aunque el autor considera que la existencia de un GMO esta altamente asociado a la existencia de Laplace’s Demon :).
+
+Pero dado que no tenemos un GMO, todas las optimizaciones son ""conservatively"" prohibidas por miedo de violar SC y esto es un costo para la performance. Entonces que hacemos? No podemos ir con las transformaciones, correcto? Poco probable, incluso la transformacion mas basica estaria prohibidad. Pensemos acerca de esto, podemos asignar una variable en un registro, si eso efectivamente elimina todas las lecturas en cualquier otra parte del programa. Reordenamiento?
+
+---
+
+image::images/jmm/032.png[]
+
+""Pendiente"", mientras podemos prohibir ciertas optimizaciones en los compiladores para evitar
+comprometer SC, no debemos olvidarnos que no es tan simple controlar el hardware. El hardware realiza un monton de reordenaciones y provee ""the costly escape hatches to intimidate reorderings ("memory barriers")"". Por lo tanto, un modelo que no controla que transformaciones son posibles y que optimizaciones son permitidas no seria realista para ejecutarse con una performance decente. Por ejemplo si es requerido que el lenguaje ofrezca SC, nosotros probablemente deberiamos de forma pesimista emitir "memory barriers" para casi todas las instrucciones que accedan a la memoria, con el objetivo de ""slay"" hardware los intentos de optimizaciones.
+
+---
+
+image::images/jmm/033.png[]
+
+""Moreover"", si nuestro programa contiene races, el hardware actual no garantiza ningun resultado en particuales al ejecutar esas operaciones conflictuadas. ""Hans Boehm and Sarita Adve stand firm on this.""
+
+---
+
+image::images/jmm/034.png[]
+
+Por lo tanto, para acomodar el modelo a la realidad y obtener un performance aceptable, tenemos que relajar el modelo.
+
+---
+
+==== Java Memory Model
+
+image::images/jmm/035.png[]
+
+Aqui es donde las cosas se complican. Dado que la especificacion debe cubrir todo los casos pobiles, pero nosotros no podemos proveer un numero finitos de construcciones que estan garantizadas para funcionar. La union de posibilidad dejaria espacios en blanco en la semantica y los espacios no son buenos.
+
+Por lo tanto, el JMM intenta cubrir todas las posibilidades. Esto lo hace describiendo las acciones que un programa puede ejecutar, y esas acciones describen posibles resultados que pueden producir al ejecutar un programa.
+Las acciones ""are bound together"" estan asociadas a las ejecucciones, que combinan las acciones con la definicion del orden que tienen con acciones relacionadas. Esto suena muy ""ivory-tower-esque"", mejor veamos unos ejemplos
+
+---
+
+===== Program Order (PO)
+
+image::images/jmm/036.png[]
+
+El primer tipo de orden es el Program Order (PO). Ordena las acciones dentro de un thread. Debemos notar el programa original, y una de sus posibles ejecucciones. Aqui, el programa puede leer "1" desde x, ejecutando la rama del else, donde se almacena "1" en z, y luego leer "algun valor" desde y.
+
+---
+
+image::images/jmm/037.png[]
+
+Program order es total (Dentro de un thread), i.e. cada par de acciones esta relacionada por su orden, por lo cual es importante entender algunas cosas.
+Las acciones linkeadas entre si en PO no ""preclude being "reordered""". De hecho, es un poco confuso hablar de reordenamiento de acciones, por que uno probablemente intenta hablar de sentencias reordenadas en un programa, lo cual genera nuevas ejecucciones. Lo cual genera una nueva pregunta sobre si las ejecucciones generadas por este nuevo programa violan las "provisions"" del JMM.
+
+Program order no genera nuevas ejecucciones, y repetimos que no genera garantias de reordenamiento. Solo existe para proveer el link entre posibles ejecucciones y el programa original.
+
+---
+
+image::images/jmm/038.png[]
+
+Lo que queremos decir es que dado el simple esquema ""schematics"" de acciones y ejecucciones, se pueden construir un infinito numero de ejecucciones. Estas ejecucciones estan desenganchadas de una realidad especifica, solo son ""primordial soup"", conteniendo todas las construcciones posibles. En algun lado en este grupo se encuentran las ejecucciones que pueden explicar un posible resultado para el programa dado, y el conjunto de todas las ""and the set of all such plausible executions"" posibles ejecucciones cubre el grupo de todos los posibles resultados del programa.
+
+---
+
+image::images/jmm/039.png[]
+
+Aqui es donde Program Order (PO) ""jumps in"". Para filtrar las ejecucciones, ""we can take to reason about the particular program"", tenemos reglas de consistencia intra-thread, lo cual elimina todas las acciones no relacionadas. Por ejemplo, en el ejemplo anterior, mientras que la ilustraccion es posible no refleja el programa original, despues de leer el valor 2 desde x, en ese caso debemos escribir 1 a y no en z.
+
+---
+
+image::images/jmm/040.png[]
+
+Aqui tenemos una ilustraccion del filtro aplicado. La consistencia Intra-thread es el primer filtro de ejecucciones, esto es lo que la mayoria de las personas hacen de forma implicita en sus cabezas cuando se lidia con el JMM. A este punto se puede notar que el JMM no es un modelo constructivo ""is a non-constructive model"": No construimos la solucion de forma inductiba ""inductively"", pero en su lugar tomamos el conjunto entero de ejecucciones ""the entire realm of executions"" y filtramos aquellas que son interesantes para nosotros.
+
+---
+
+===== Synchronization Order
+
+image::images/jmm/041.png[]
+
+Ahora empezamos a construir partes del modelo que realmente ordenan cosas. En un modelo de memoria relajado, nosotros no ordenamos todas las acciones, solo ""impose"" imponemos un orden en un conjunto limitado de primitivas. En el JMM, esas primitivas son encapsuladas en sus respectivas acciones "Synchronization Actions".
+
+---
+
+image::images/jmm/042.png[]
+
+Synchronization Order (SO) es total orden dentro del conjunto de todas las Synchronization Actions, aunque esto no es lo mas interesante de este orden. El JMM provee dos limitantes ""constraints"" adicionales:
+* Consistencia SO-PO
+* Consistencia SO
+
+Veamos esto con un ejemplo trivial.
+
+---
+
+image::images/jmm/043.png[]
+
+Este es un ejemplo simple derivado de ""Dekker Lock"". Intentemos pensar en los posibles resultados
+posibles y el por que de ellos. Luego, analizaremos esto en el JMM.
+
+---
+
+Las slides a continuacion son auto-explicativas, y ""we’ll just skip them over"":
+
+image::images/jmm/044.png[]
+
+image::images/jmm/045.png[]
+
+image::images/jmm/046.png[]
+
+image::images/jmm/047.png[]
+
+image::images/jmm/048.png[]
+
+image::images/jmm/049.png[]
+
+---
+
+Ahora si prestamos atencion a estas reglas, notaremos una interesante propiedad. La consistencia SO-PO nos indica que los efectos de SO son visibles como si las acciones fueran realizadas en Program Order. ""SO consistency tells us to observe all the actions preceding in the SO, even those that happened in a different thread. It is as if SO-PO consistency tells us to follow the program, and SO consistency allows us to "switch between threads" with all effects trailing us. Mixed with the totality of SO, we arrive at an interesting rule"":
+
+---
+
+image::images/jmm/050.png[]
+
+Synchronization Actions son secuencialmente consistente. En un programa formado por variable volatiles, podemos razonar acerca del resultado sin analizar demasiado en profundidad. Dado que SAs son secuencialmente consistente, podemos construir todas las intercalaciones de acciones y descubrir los posibles resultados desde ahi. Debemos notar que aun no hay un "happens-before"; entonces SO es suficiente para el razonamiento.
+
+---
+
+===== Happens-Before
+
+image::images/jmm/051.png[]
+
+SO provee una forma basica para razonar acerca de los posibles resultado, pero SO no es suficiente para construir un weak model. Aqui esta el porque.
+
+---
+
+image::images/jmm/052.png[]
+
+Analizemos este simple caso. Dado todo lo que aprendimos hasta aca acerca de SO, es posible obtener como resultado (1, 0)?
+
+---
+
+image::images/jmm/053.png[]
+
+Veamos. Dado que SO solo ordena acciones sobre g, nada previene que leamos 0 o 1 desde x.Lo cual es malo!.
+
+---
+
+image::images/jmm/054.png[]
+
+Necesitamos algo para conectar el estado de los threads, ""something which will drag the non-SA values along"". SO no es usado para esto, porque no es claro cuando y como ""drags the state along"". Por lo cual, necesitamos ""clear-cut suborder of SO"" que describa el data flow. Esto es llamado synchronizes-with order (SW).
+
+---
+
+image::images/jmm/055.png[]
+
+Es facil construir acciones SW. SW es orden parcial, y no se expande a todos los pares de SA. Por ejemplo aunque las dos operaciones sobre g son SO, ellas no son SW.
+
+---
+
+image::images/jmm/056.png[]
+
+SW solo juntas los pares de acciones especificas las cuales se "ven" unas a las otras. Mas formalmente el write sobre g "synchronizes-with" todos los subsiguientes reads en g. Subsiguiente es definido en terminos de SO, y por lo tanto en base a la consistencia SO, el write de "1" solo se sincroniza con la lectura de "1". En este ejemplo vemos el SW entre las acciones. Este suborden nos brinda el "bridge" entre threads, pero aplicado a SA. Extendamos esto a otras acciones.
+
+---
+
+image::images/jmm/057.png[]
+
+La semantica Intra-thread es descripta por el Program Order.
+
+---
+
+image::images/jmm/058.png[]
+
+Ahora, si construimos la union entre PO y SW, y luego cerramos esa union, obtenemos el orden derivado: Happens-Before (HB). HB en este sentido adquiere ambas semanticas Inter-Thread y Intra-Thread. PO ""leaks"" la informacion acerca de las sequential actions en cada thread en HB. y SW ""leaks"" cuando el estado "synchronizes". HB es orden parcial, y nos permite la construccion de ejecucciones equivalentes con reordenamientos de acciones.
+
+---
+
+image::images/jmm/059.png[]
+
+Happen-before viene con otra regla de consistencia. Si recordamos la regla de consistencia de SO, que establece que la sincronizacion de acciones debe ver el ultimo write en SO. La consistencia de Happens-before es similar aplicada al orden del tipo HB. Esto ""dictates"" dicta que los writes pueden ser observados por cualquier read en particular.
+
+---
+
+image::images/jmm/060.png[]
+
+La consistencia HB es interesante en permitir "races". Cuando no hay "races" presentes, solo podemos ver el ultimo write en HB. Pero si tenemos un unordered write en HB que respecta a un cierto read, entonces podemos ver ese "racy" write. Definamos esto de forma mas rigurosa.
+
+---
+
+image::images/jmm/061.png[]
+
+La primer parte ""is rather relaxing"": Podemos observar los write que pasaron antes que nosotros, o cualquier otro unordered write. Esta es una propiedad muy importante del modelo: nosotros especificamente permitimos "races", porque "races" suceden en el mundo real. Si estos fueran prohibidos, los runtimes tendrian una tarea muy complicada optimizando el codigo porque ellos necesitarian forzar el orden en todos lados.
+Notemos como esto nos elimina la posibilidad de ver ""writes ordered"" luego de leer en HB orden.
+
+---
+
+image::images/jmm/062.png[]
+
+La segunda parte agregar algunas restricciones adicionales sobre la visibilidad de los ""preceding writes"": Solo podemos ver el ultimo write en HB orden. Cualquier otro write anterior es invisible para nosotros. Por lo tanto, en la ausencia de "races", solo podemos ver el ultimo write en HB.
+
+---
+
+image::images/jmm/063.png[]
+
+La consecuencia de la consistencia de HB es para filtrar otro subset de ejecucciones que observan algo que esta permitido de ser observado. HB se extiende sobre las acciones "non-synchronized", y por lo tanto deja al modelo ""embrace"" todas las acciones en sus ejecucciones.
+
+---
+
+image::images/jmm/064.png[]
+
+Todo esto es acerca de SC-DRF: Si no tenemos "races" en nuestro programa, todos los reads y writes son ordenados por SO o HB, por lo cual el resultado puede ser explicado por algun tipo de ejecuccion que sea sequentially consistent. Hay una prueba forma de las propiedades de SC-DRF, pero vamos a usar entendimiento intuitivo de por que esto debe ser cierto.
+
+---
+
+image::images/jmm/065.png[]
+
+The examples above were rather highbrow, but that is how language spec is defined. Let’s look at the example to understand this more intuitively. Take the same code example, and analyze it with HB consistency rules.
