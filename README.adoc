@@ -1,67 +1,68 @@
 = Java Memory Model Pragmatics (transcripción al español)
 :toc: macro
+:sectnumlevels: 4
 
-Este repositorio contiene la traduccion de la charla https://shipilev.net/blog/2014/jmm-pragmatics[jmm-pragmatics] brindada por https://shipilev.net[Aleksey Shipilёv], ademas ejemplifica algunos de los conceptos utilizando la herramienta link:JCStress.adoc[jcstress]. Este documento es una guia para ir explicando diversos conceptos que estan relacionado con el comportamiento del Java Memory Model, por lo cual encontraremos distintos links a documentos auxiliares.
+Este repositorio contiene la traducción de la charla https://shipilev.net/blog/2014/jmm-pragmatics[jmm-pragmatics] brindada por https://shipilev.net[Aleksey Shipilёv], además ejemplifica algunos de los conceptos utilizando la herramienta link:JCStress.adoc[jcstress]. Este documento es una guía para ir explicando diversos conceptos que están relacionado con el comportamiento del Java Memory Model, por lo cual encontraremos distintos links a documentos auxiliares.
 
 toc::[]
 == Prologo
-El Java Memory Model(JMM) es una de las partes mas complicadas de la Java Spec, la cual al menos deberia ser comprendida por frameworks developers. Desafortunadamente, esta redactado de tal manera que se necesitan algunos senior developers para descifrarlo. La mayoria de los developers no utlizan de forma correcta las reglas definidas por el JMM, ni tampoco crean estructuras basadas en ellas, sino que ciegamente copian construcciones creadas por alguien mas sin entender los limites de su aplicabilidad. Si sos uno de esos developers que no esta interesado en hardcore concurrency, puedes evitar leer esto e ir directo a algo mas de alto nivel, como https://www.amazon.com/Java-Concurrency-Practice-Brian-Goetz/dp/0321349601["Java Concurrency in Practice"]. Si sos uno de esos senior developers que esta interesado en saber como funciona todo esto, continua leyendo!
+El Java Memory Model(JMM) es una de las partes mas complicadas de la Java Spec, la cual al menos debería ser comprendida por frameworks developers. Desafortunadamente, esta redactado de tal manera que se necesitan algunos senior developers para descifrarlo. La mayoría de los developers no utilizan de forma correcta las reglas definidas por el JMM, ni tampoco crean estructuras basadas en ellas, sino que ciegamente copian construcciones creadas por alguien mas sin entender los limites de su aplicabilidad. Si eres uno de esos developers que no esta interesado en hardcore concurrency, puedes evitar leer esto e ir directo a algo mas de alto nivel, como https://www.amazon.com/Java-Concurrency-Practice-Brian-Goetz/dp/0321349601["Java Concurrency in Practice"]. Si eres uno de esos senior developers que esta interesado en saber como funciona todo esto, continua leyendo!
 
-La charla "Java Memory Model Pragmatics", fue brindada en 2014 en varias conferencias, mayormente en Rusia. Dado que parecia haber una cantidad limitada de conferencias con la capacidad para cubrir una charla tan larga y debido a una necesidad concreta sobre exponer cierto material de lectura para unos workshop en JVMLS, se decidio hacer la transcripción al ingles.
+La charla "Java Memory Model Pragmatics", fue brindada en 2014 en varias conferencias, mayormente en Rusia. Dado que parecía haber una cantidad limitada de conferencias con la capacidad para cubrir una charla tan larga y debido a una necesidad concreta sobre exponer cierto material de lectura para unos workshop en JVMLS, se decidió hacer la transcripción al ingles.
 
-Estaremos reutilizando un monton de slides, y trataremos de construir una narracion basada en ellas. Algunas veces los slides son auto-explicativos y no brindaremos una explicacion. Los slides estan disponibles en https://shipilev.net/talks/narnia-2555-jmm-pragmatics-ru.pdf[Ruso] e https://shipilev.net/talks/narnia-2555-jmm-pragmatics-en.pdf[Ingles].
+Estaremos reutilizando un montón de slides, y trataremos de construir una narración basada en ellas. Algunas veces los slides son auto-explicativos y no brindaremos una explicación. Los slides estan disponibles en https://shipilev.net/talks/narnia-2555-jmm-pragmatics-ru.pdf[Ruso] e https://shipilev.net/talks/narnia-2555-jmm-pragmatics-en.pdf[Ingles].
 
-Se agradece a https://twitter.com/BrianGoetz[Brian Goetz], Doug Lea, David Holmes, https://twitter.com/kuksenk0[Sergey Kuksenko], Dmitry Chyuko, https://twitter.com/AstragaliUSA[Mark Cooper], https://twitter.com/cscotta[C. Scott Andreas], https://twitter.com/joejkearney[Joe Kearney] y muchos otros por sus correciones y comentarios utiles. La seccion sobre "final fields" contiene informacion provista por https://twitter.com/VladimirSitnikv[Vladimir Sitnikov] y Valentin Kovalenko, asi como el extracto de su charla sobre http://www.slideshare.net/VladimirSitnikv/final-field-semantics["Final Fields Semantics"].
+Se agradece a https://twitter.com/BrianGoetz[Brian Goetz], Doug Lea, David Holmes, https://twitter.com/kuksenk0[Sergey Kuksenko], Dmitry Chyuko, https://twitter.com/AstragaliUSA[Mark Cooper], https://twitter.com/cscotta[C. Scott Andreas], https://twitter.com/joejkearney[Joe Kearney] y muchos otros por sus correcciones y comentarios útiles. La sección sobre "final fields" contiene información provista por https://twitter.com/VladimirSitnikv[Vladimir Sitnikov] y Valentin Kovalenko, así como el extracto de su charla sobre http://www.slideshare.net/VladimirSitnikv/final-field-semantics["Final Fields Semantics"].
 
-== Introduccion
+== Introducción
 
 image::images/jmm/001.png[]
 
-Primero, una slide para romper el hielo. https://twitter.com/gakesson[@gakesson], *saludanos!*
+Primero, una slide para romper el hielo. https://twitter.com/gakesson[@gakesson], *Salúdanos!*
 
 ---
 
 image::images/jmm/002.png[]
 
-Si leemos cualquier spec acerca de un lenguaje, vamos a notar que puede ser dividad en dos partes relacionadas pero distintas. Primero, nos encontramos con una parte simple, la cual llamamos sintaxis (syntax), la cual describe como escribir programas en ese lenguaje. Segundo, la parte mas complicada es conocida como semantica (semantics), la cual describe exactamente lo que significa cada sintaxis en particular. Generalmente, las spec describen la semantica por medio del comportamiento de una https://es.wikipedia.org/wiki/Máquina_abstracta[abstract machine] que ejecuta el programa, de este modo la spec es solo una especificacion de abstract machine.
+Si leemos cualquier spec acerca de un lenguaje, vamos a notar que puede ser separadas en dos partes relacionadas pero distintas. Primero, nos encontramos con una parte simple, la cual llamamos sintaxis (syntax), la cual describe como escribir programas en ese lenguaje. Segundo, la parte mas complicada es conocida como semantica (semantics), la cual describe exactamente lo que significa cada sintaxis en particular. Generalmente, las spec describen la semántica por medio del comportamiento de una https://es.wikipedia.org/wiki/Máquina_abstracta[abstract machine] que ejecuta el programa, de este modo la spec es solo una especificación de abstract machine.
 
 ---
 
 image::images/jmm/003.png[]
 
-Cuando el lenguaje posee almacenamiento (Variables, Heap Memory, etc.), la abstract machine tambien posee almacenamiento, y tenemos que definir un conjuntos de reglas acerca de como se comporta el almacenamiento. Esto es lo que llamamos "memory model". Si el lenguaje no posee almacenamiento explicito (e.g los datos son pasados en contextos de llamadas), entonces tu modelo de memoria es bastante simple. El "memory model" parece responder a una pregunta simple: ¿Que valores puede observar una instruccion read?
+Cuando el lenguaje posee almacenamiento (Variables, Heap Memory, etc.), la abstract machine también posee almacenamiento, y tenemos que definir un conjuntos de reglas acerca de como se comporta el almacenamiento. Esto es lo que llamamos "Memory Model". Si el lenguaje no posee almacenamiento explicito (e.g los datos son pasados en contextos de llamadas), entonces su modelo de memoria es bastante simple. El "Memory Model" parece responder a una pregunta simple: ¿Qué valores puede observar una instrucción read?
 
 ---
 
 image::images/jmm/004.png[]
 
-En programas secuenciales, esto parece ser una pregunta sin mucho sentido, porque si nuestro programa es secuencial, cada store en la memoria viene dado con un determinado orden, y es obvio que cada "read" debe observar el ultimo "write" aplicado. Por eso solemnos cruzarnos con el concepto de "memory model" en programas mult-thread, donde esta pregunta se vuelve mas complicada de responder. Sin embargo el "memory model" tambien importa en programas secuenciales (Aunque en este caso esta inteligentemente disfrazado en la nocion de orden de evaluacion).
+En programas secuenciales, esto parece ser una pregunta sin mucho sentido, porque si nuestro programa es secuencial, cada store en la memoria viene dado con un determinado orden, y es obvio que cada "read" debe observar el ultimo "write" aplicado. Por eso usualmente nos cruzamos con el concepto de "Memory Model" en programas multi-hilos, donde esta pregunta se vuelve un poco mas complicada de responder. Sin embargo el "Memory Model" también importa en programas secuenciales (Aunque en este caso esta inteligentemente disfrazado en la noción de orden de evaluación).
 
 ---
 
 image::images/jmm/005.png[]
 
-Por ejemplo, el abominable ejemplo de link:UndefinedBehaviour.adoc["undefined behaviour"] en un programa "C", que utiliza algunos incremento entre los link:SequencePoint.adoc["sequence points"]. Este programa puede satisfacer la condicion establecidad, fallar o incluso link:UndefinedBehaviour.adoc#nasal-demons["nasal demons"]. Uno podria argumentar que el resultado de este programa puede ser diferente porque el orden de evaluacion de los incrementos es diferente, pero eso no explicaria, el resultado de "12", cuando ninguno de los incrementos puede ver el valor escrito por el otro. Esta es una preocupación del "memory model": ¿Que valor debe ser visto por cada incremento, y que deberia ser almacenado?
+Por ejemplo, el abominable ejemplo de link:UndefinedBehaviour.adoc["undefined behaviour"] en un programa "C", que utiliza algunos incremento entre los link:SequencePoint.adoc["sequence points"]. Este programa puede satisfacer la condición establecida, fallar o incluso link:UndefinedBehaviour.adoc#nasal-demons["nasal demons"]. Uno podría argumentar que el resultado de este programa puede ser diferente porque el orden de evaluación de los incrementos es diferente, pero eso no explicaría, el resultado de "12", cuando ninguno de los incrementos puede ver el valor escrito por el otro. Esta es una preocupación del "Memory Model": ¿Qué valor debe ser visto por cada incremento, y que debería ser almacenado?
 
 ---
 
 image::images/jmm/006.png[]
 
-De cualquier manera, si nos presentan el desafio de implementar un lenguaje, podemos optar por "Interpretacion" o "Compilacion", independientemente de nuestra eleccion ambos caminos estan conectados por link:FutamuraProjections.adoc[Futamura Projections].
+De cualquier manera, si nos presentan el desafío de implementar un lenguaje, podemos optar por "Interpretación" o "Compilación", independientemente de nuestra elección ambos caminos están conectados por link:FutamuraProjections.adoc[Futamura Projections].
 
-La conclusión práctica es que tanto el intérprete y compilador tienen la tarea de emular una máquina abstracta. Los compiladores suelen ser acusados de arruinar los modelos de memoria y programa multithreading, pero los interpretes no son inmunes. Fallar en ejecutar un interprete para la maquina abstracta puede generar violaciones al modelo de memoria. Lo cual nos lleva a un interesante trade-off.
+La conclusión práctica es que tanto el intérprete y compilador tienen la tarea de emular una máquina abstracta. Los compiladores suelen ser acusados de arruinar los modelos de memoria y en programas multi-hilos, pero los interpretes no son inmunes. Fallar al ejecutar un interprete para la maquina abstracta puede generar violaciones al modelo de memoria. Lo cual nos lleva a un interesante trade-off.
 
 ---
 
 image::images/jmm/007.png[]
 
-La razon por la cual los lenguajes de programacion necesitan que desarrolladores habiles es la absencia de "hypersmart compilers". "Hyper" no es una exageracion: Alguno de los problemas en la creacion de compiladores no tienen solucion en la teoria y menos en la practica. Otros problemas interesantes pueden ser posibles en la teoria pero no en la practica.
+La razón por la cual los lenguajes de programación necesitan que desarrolladores hábiles se debe a la ausencia "hypersmart compilers". "Hyper" no es una exageración: Alguno de los problemas en la creación de compiladores no tienen solución en la teoría y menos en la practica. Otros problemas interesantes pueden ser posibles en la teoría pero no en la practica.
 
 ---
 
 image::images/jmm/008.png[]
 
-Para más detalles sobre estos temas, el resto de la charla estara estructurada de la siguiente manera.
+Para procesar estas ideas, el resto de la charla estará estructurada de la siguiente manera.
 
 ---
 
@@ -71,7 +72,7 @@ Para más detalles sobre estos temas, el resto de la charla estara estructurada 
 
 image::images/jmm/009.png[]
 
-Una de las cosas mas simple para entender en el JMM es la garantia de acceso atomico. Para definir esto vamos a introducir un poco mas de notacion. En el ejemplo de este slide, se pueden ver una tabla con dos columnas. Esto lo podemos leer de la siguiente forma, todo lo que esta en el encabezado ya ha sido ejecutado y almacenado en memoria. Cada columna representa a un thread distinto. En este ejemplo el Thread 1 almacena algun valor "V2" en una variable global (O sea compartida por ambos threads), Thread 2 lee esta variable y comprueba si el valor es "V1" o "V2". Queremos asegurarnos que el Thread 2 solo lee valores posibles y no algun valor intermedio.
+Una de las cosas mas simple para entender en el JMM es la garantía de acceso atómico. Para definir esto vamos a introducir un poco mas de notación. En el ejemplo de este slide, se pueden ver una tabla con dos columnas. Esto lo podemos leer de la siguiente forma, todo lo que esta en el encabezado ya ha sido ejecutado y almacenado en memoria. Cada columna representa a un thread distinto. En este ejemplo el Thread 1 almacena algún valor "V2" en una variable global (O sea compartida por ambos threads), Thread 2 lee esta variable y comprueba si el valor es "V1" o "V2". Queremos asegurarnos que el Thread 2 solo lee valores posibles y no algún valor intermedio.
 
 ---
 
@@ -370,7 +371,7 @@ image::images/jmm/049.png[]
 
 ---
 
-Ahora si prestamos atencion a estas reglas, notaremos una interesante propiedad. La SO-PO consistency nos indica que los efectos de SO son visibles como si las acciones fueran realizadas en Program Order. 
+Ahora si prestamos atencion a estas reglas, notaremos una interesante propiedad. La SO-PO consistency nos indica que los efectos de SO son visibles como si las acciones fueran realizadas en Program Order.
 
 La SO consistency nos indica observar todas las acciones precedentes en el SO, incluso aquellas que ocurrieron en un thread diferente. Esto es como si SO-PO consistency nos indicara para seguir el programa, y SO consistency nos permite hacer switch entre los threads, arrastrando todos los efectos. Mezclado con la totalidad de SO, llegamos a una regla interesante:
 
