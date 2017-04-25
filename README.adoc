@@ -80,24 +80,23 @@ Una de las cosas mas simple para entender en el JMM es la garantía de acceso at
 
 image::images/jmm/010.png[]
 
-Esto parece un requerimiento bastante obvio para cualquier lenguaje de programacion: ¿Como esto puede no suceder? y ¿Por qué? Aca tenemos el por qué.
+Esto parece un requerimiento bastante obvio para cualquier lenguaje de programación: ¿Cómo esto puede no suceder? y ¿Por qué? Acá tenemos el por qué.
 
-Para asegurar atomicidad antes accesos concurrentes, necesitamos
-tener instrucciones basicas operando con un determinado tamaño, de otro modo la atomicidad es violada a nivel de instruccion: Si necesitamos separar el acceso en multiples sub-accessos, estos pueden ser intercalados con otras instrucciones. Pero incluso si tenemos operaciones para determinados tamaños, estas aun pueden no ser atomicas: @PendingTranslation for example, the atomicity guarantees for 2- and 4-byte reads are unknown for PowerPC (they are implied to be atomic).
+Para asegurar atomicidad antes accesos concurrentes, necesitamos tener instrucciones básicas operando con un determinado tamaño, de otro modo la atomicidad es violada a nivel de instrucción: Si necesitamos separar el acceso en múltiples sub-accesos, estos pueden ser intercalados con otras instrucciones. Pero incluso si tenemos operaciones para determinados tamaños, estas aun pueden no ser atómicas: Por ejemplo la garantía de atomicidad para instrucciones de 2-4 bytes en PowerPC son desconocidas (Se supone que son atómicas).
 
 ---
 
 image::images/jmm/011.png[]
 
-La mayoria de las plataformas garantiza atomicidad hasta accesos de 32 bits, el JMM tiene el mismo *compromiso* y relaja los accesos de 64 bits. De todos modos hay formas de forzar atomicidad para valores de 64 bits, e.g. por medio de un lock en la lectura y escritura aunque esto tiene un costo, por lo cual una posible via de escape es utilizar *volatile* en donde se requiera de atomicidad y la VM junto con el Hardware haran todo el trabajo, sin importar el costo.
+La mayoría de las plataformas garantiza atomicidad hasta accesos de 32 bits, el JMM tiene el mismo *compromiso* y relaja los accesos de 64 bits. De todos modos hay formas de forzar atomicidad para valores de 64 bits, e.g. por medio de un lock en la lectura y escritura aunque esto tiene un costo, por lo cual una posible vía de escape es utilizar *volatile* en donde se requiera de atomicidad y la VM junto con el Hardware harán todo el trabajo, sin importar el costo.
 
 ---
 
 image::images/jmm/012.png[]
 
-Aunque tengamos operaciones que trabajen con determinado tamaño esto no es suficiente para garantizar la atomicidad en la mayoria de los Hardware. Por ejemplo, si el acceso a los datos causa multiples transacciones a la memoria principal, la atomicidad no es garantizada, incluso cuando se ejecute una sola instruccion. Si tomamos como ejemplo x86, la atomicidad no esta garantizada si los read/write se expanden a dos lineas distintas de la cache, por que esto requiere dos transacciones a la memoria. Esto es por que en general solo los datos aligneados pueden ser leidos o escritos de forma atomica, lo que fuerza a las VMs a link:DataAlignment.adoc[alinear los datos].
+Aunque tengamos operaciones que trabajen con determinado tamaño esto no es suficiente para garantizar la atomicidad en la mayoría de los Hardware. Por ejemplo, si el acceso a los datos causa múltiples transacciones a la memoria principal, la atomicidad no es garantizada, incluso cuando se ejecute una sola instrucción. Si tomamos como ejemplo x86, la atomicidad no esta garantizada si los read/write se expanden a dos líneas distintas de la cache, por que esto requiere dos transacciones a la memoria. Esto es por que en general solo los datos alineados pueden ser leídos o escritos de forma atómica, lo que fuerza a las VMs a link:DataAlignment.adoc[alinear los datos].
 
-En este ejemplo que fue generado con http://openjdk.java.net/projects/code-tools/jol/[JOL], podemos ver que el field de tipo long esta posicionado desde el offset 16, esto se debe a que los objetos se alinean de 8 bytes, podriamos posicionar el long desde el offset 12 pero si hicieramos eso, el funcionamiento seria dependiende de la plataforma y algunas de ellas no aceptan accesos a datos no alineados y en otros casos pueden haber problemas de performance.
+En este ejemplo que fue generado con http://openjdk.java.net/projects/code-tools/jol/[JOL], podemos ver que el field de tipo long esta posicionado desde el offset 16, esto se debe a que los objetos se alinean de 8 bytes, podríamos posicionar el long desde el offset 12 pero si hiciéramos eso, el funcionamiento seria dependiente de la plataforma y algunas de ellas no aceptan accesos a datos no alineados y en otros casos pueden haber problemas de performance.
 
 ---
 
@@ -105,7 +104,7 @@ En este ejemplo que fue generado con http://openjdk.java.net/projects/code-tools
 
 image::images/jmm/013.png[]
 
-Verifiquemos nuestro entendimiento con una simple pregunta. ¿Es posible leer algun valor intermedio? dado que Java utiliza la link:BinaryRepresentation.adoc[representacion binaria] complemento a dos, asignar -1L es equivalente a asignar 1 a todos los bits en el long.
+Verifiquemos nuestro entendimiento con una simple pregunta. ¿Es posible leer algún valor intermedio? dado que Java utiliza la link:BinaryRepresentation.adoc[representación binaria] complemento a dos, asignar -1L es equivalente a asignar 1 a todos los bits en el long.
 
 *Respuesta*: Esto funciona de forma correcta porque la clase AtomicLong contiene un field long el cual es volatile.
 
@@ -115,11 +114,9 @@ Verifiquemos nuestro entendimiento con una simple pregunta. ¿Es posible leer al
 
 image::images/jmm/014.png[]
 
-En Java, somos "afortunados" de tener algunos tipos built-in que tienen un tamaño pequeño. En otros lenguajes donde el tamaño es arbitrario, esto presenta algunos desafios interesantes para el modelo de memoria.
+En Java, somos "afortunados" de tener algunos tipos built-in que tienen un tamaño pequeño. En otros lenguajes donde el tamaño es arbitrario, esto presenta algunos desafíos interesantes para el modelo de memoria.
 
-En este ejemplo, C++ es compatible con C soportando estructuras. C++11 adicionalmente soporta std::atomic, lo cual requiere acceso atomico para cada POD (Plain Old Data). Si nosotros definimos el ejemplo del slide la implementacion es forzada a manejar accesos de escritura y lectura de forma atomica para 104-bytes. Dado que no hay instrucciones que permitan acceso atomico para ese tamaño la implementacion debe recurrir a utilizar link:CAS.adoc[CAS], locking o algo mas.
-
-In this example, C++ follows C compatibility by supporting structs. C++11 additionally supports std::atomic, which requires access atomicity for every Plain Old Data (POD) type T. So, if we do a trick like this in C++11, the implementations are forced to deal with atomically writing and reading the 104-byte memory blocks. There are no machine instructions which can guarantee atomicity at these widths, so implementation should resort to either CAS-ing, or locking, or something else.
+En este ejemplo, C++ es compatible con C soportando estructuras. C++11 adicionalmente soporta std::atomic, lo cual requiere acceso atómico para cada POD (Plain Old Data). Si nosotros definimos el ejemplo del slide la implementación es forzada a manejar accesos de escritura y lectura de forma atómica para 104-bytes. Dado que no hay instrucciones que permitan acceso atómico para ese tamaño la implementación debe recurrir a utilizar link:CAS.adoc[CAS], locking o algo mas.
 
 (It gets even more interesting since C++ allows separate compilation: now the linker is tasked with the job of figuring out what locks/CAS-guards are used by this particular std::atomic. I am not completely sure what happens if threads execute the code generated by different compilers in the example above.)
 
