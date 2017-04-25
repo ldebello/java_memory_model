@@ -283,7 +283,7 @@ Por lo tanto, para acomodar el modelo a la realidad y obtener un performance ace
 
 ---
 
-==== Java Memory Model
+=== Java Memory Model
 
 image::images/jmm/035.png[]
 
@@ -294,7 +294,7 @@ Las acciones estan asociadas a las ejecucciones, que combinan las acciones con l
 
 ---
 
-===== Program Order (PO)
+==== Program Order (PO)
 
 image::images/jmm/036.png[]
 
@@ -329,7 +329,7 @@ Aqui tenemos una ilustraccion del filtro aplicado. La consistencia Intra-thread 
 
 ---
 
-===== Synchronization Order
+==== Synchronization Order
 
 image::images/jmm/041.png[]
 
@@ -396,7 +396,7 @@ To conclude with our Venn diagram, SO consistencies filter out the executions wi
 
 ---
 
-===== Happens-Before
+==== Happens-Before
 
 image::images/jmm/053.png[]
 
@@ -482,6 +482,8 @@ image::images/jmm/066.png[]
 Todo esto es acerca de SC-DRF: Si no tenemos "races" en nuestro programa, todos los reads y writes son ordenados por SO o HB, por lo cual el resultado puede ser explicado por algun tipo de ejecuccion que sea sequentially consistent. Hay una prueba forma de las propiedades de SC-DRF, pero vamos a usar entendimiento intuitivo de por que esto debe ser cierto.
 
 ---
+
+==== Happens-Before: Publication
 
 image::images/jmm/067.png[]
 
