@@ -12,7 +12,7 @@ que sería una función con tipo
 
 * f:: X × Y → R
 
-Este tipo significa que f es una función que toma un par de árgumentos y devuelve un resultado. De hecho, se usa el tipo producto de X por Y (producto cartesiano).
+Este tipo significa que f es una función que toma un par de argumentos y devuelve un resultado. De hecho, se usa el tipo producto de X por Y (producto cartesiano).
 
 Lo que se suele escribir es
 
@@ -66,7 +66,7 @@ Una de las características de los modelos de computación tales como el lambda 
 
 Antes de nada, empezaremos viendo cómo funciona un programa cuando queremos ejecutarlo. La idea es que tenemos el programa "prog" y se lo pasamos a otro programa "interp" para que lo interprete. Generalmente también le pasamos una entrada "entrada" y el resultado es una salida.
 
-Todo esto se puede poner en notación metemática ya que, grancias a la Turing completitud, el intérprete no es más que un programa.
+Todo esto se puede poner en notación matemática ya que, gracias a la Turing completitud, el intérprete no es más que un programa.
 
 * interp(prog,entrada)=salida
 

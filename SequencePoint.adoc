@@ -2,14 +2,14 @@
 
 _Extraido de la Wikipedia_
 
-Un punto de secuencia define un punto en la ejecución de un programa en el cual esta garantizado que todos los "side effects" de evaluaciones anteriores fueron ejecutado, y no hay "side effects" de secuencias posteriores que hayan sido ejecutados. Cuando se alcanza un punto de secuencia todos los "side effects" son evaluados antes de ir al siguiente paso. Son conceptos core de C y C++ que se utilizan para validar los posibles resultados de una expresion. A veces es necesario agregar mas punto de secuencia para asegurar un order unico de evaluacion.
+Un punto de secuencia define un punto en la ejecución de un programa en el cual esta garantizado que todos los "side effects" de evaluaciones anteriores fueron ejecutado, y no hay "side effects" de secuencias posteriores que hayan sido ejecutados. Cuando se alcanza un punto de secuencia todos los "side effects" son evaluados antes de ir al siguiente paso. Son conceptos core de C y C++ que se utilizan para validar los posibles resultados de una expresión. A veces es necesario agregar mas punto de secuencia para asegurar un orden único de evaluación.
 
 En C++11 el uso de "sequence point" fue reemplazado por "sequencing". Hay tres posibilidades
 
-* La evaluacion de una expresion puede ser "sequenced before" que otra expresion, o equivalentemente la otra expresion es "sequenced after" que la primera.
+* La evaluación de una expresión puede ser "sequenced before" que otra expresión, o equivalentemente la otra expresion es "sequenced after" que la primera.
 
-* La evaluacion de una expresion puede ser "inderterminately sequenced", lo cual se refiere a que una es "sequenced before" la otra, pero esto no es especificado.
+* La evaluación de una expresión puede ser "inderterminately sequenced", lo cual se refiere a que una es "sequenced before" la otra, pero esto no es especificado.
 
-* La evaluacion de una expresion puede "unsequenced".
+* La evaluación de una expresión puede "unsequenced".
 
 La ejecución de evaluaciones "unsequenced" puede superponerse con link:UndefinedBehaviour.adoc["undefined behaviour"] si un "write" a un objeto es "unsequenced" con respecto a un acceso al mismo objeto.

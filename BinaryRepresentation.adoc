@@ -1,6 +1,6 @@
 = Binary Representation
 
-Tenemos varias formas de representar numeros positivos y negativos en binario.
+Tenemos varias formas de representar números positivos y negativos en binario.
 
 * Signo y Magnitud  (Signed Magnitude)
 * Complemento a uno (One's Complement)
@@ -9,31 +9,40 @@ Tenemos varias formas de representar numeros positivos y negativos en binario.
 
 == Signo y Magnitud (Signed Magnitude)
 
-Esta tecnica utiliza el bit mas significante para representar el signo, y el resto es utilizado para el valor. El 0 representa un numero positivo y el 1 representa un numero negativo:
+Esta técnica utiliza el bit mas significante para representar el signo, y el resto es utilizado para el valor. El 0 representa un numero positivo y el 1 representa un numero negativo:
 
 ----
 +3 = 0011
 -3 = 1011
 ----
 
-Esta representacion es simple, pero tiene algunos problemas como por ejemplo no poder sumar numeros binarios de forma simple y el numero 0 tiene dos representaciones binarias, 100...0 and 0....0.
+Esta representación es simple, pero tiene algunos problemas como por ejemplo no poder sumar números binarios de forma simple y el numero 0 tiene dos representaciones binarias, 100...0 and 0....0.
 
 == Complemento a uno (One's Complement)
 
-En esta representacion invertimos todos los bits para encontar su correspondiente numero negativo
+En esta representación invertimos todos los bits para encontrar su correspondiente numero negativo
 
 ----
 +2 = 010
 -2 = 101 (Invertimos todos los bits)
 ----
 
-El problema de esta representacion es que aun existen dos representaciones para el 0, 00..0 and 11..1.
+El problema de esta representación es que aun existen dos representaciones para el 0, 00..0 and 11..1.
 
 == Complemento a dos (Two's Complement)
 
-En esta representacion invertimos todos los bits y luego agregamos otro bit. Agregando este bit adicional resuelve el problema de tener dos representaciones binarias para el 0.
+En esta representación invertimos todos los bits y luego agregamos otro bit. Agregando este bit adicional resuelve el problema de tener dos representaciones binarias para el 0.
 
 ----
 +4 = 0100
--4 = 0100 -> 1011 -> 1011 + 1 = 1100 (Invertimos todos los bits y luego sumamos un bit)
+-4 = 0100 -> 1011 -> 1011 + 1 (En binario es 0001) = 1100 (Invertimos todos los bits y luego sumamos uno)
 ----
+
+[options="header"]
+|===
+|Tabla de suma binaria
+|0 + 0 = 0
+|0 + 1 = 1
+|1 + 0 = 1
+|1 + 1 = 10 (0 y llevamos el 1)
+|===

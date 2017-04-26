@@ -1,14 +1,14 @@
 == Compare and Swap
 
-Este algoritmo compara el contenido de una posicion de memoria contra un valor dado, si los valores son los mismo modifica el contenido con un nuevo valor. Esto es realizado como una operacion atomica. La atomicidad garantiza que el nuevo valor fue calculado en base a informacion actualizada. Si el valor fue actualizado por otro thread, la escritura fallara. El resultado de la operacion debe indicar si la operacion realizo la substitución; esto puede ser indicado por medio de un valor booleano en la respuesta.
+Este algoritmo compara el contenido de una posición de memoria contra un valor dado, si los valores son los mismo modifica el contenido con un nuevo valor. Esto es realizado como una operación atómica. La atomicidad garantiza que el nuevo valor fue calculado en base a información actualizada. Si el valor fue actualizado por otro thread, la escritura fallara. El resultado de la operación debe indicar si la operación realizo la substitución; esto puede ser indicado por medio de un valor booleano en la respuesta.
 
-La operacion de CAS tiene 3 parametros:
+La operación de CAS tiene 3 parámetros:
 
-* Una ubicacion de memoria donde debemos reemplazar el valor
-* Valor anterior que fue leido por el thread
-* Valor nuevo que debe sobrrescribir el anterior
+* Una ubicación de memoria donde debemos reemplazar el valor
+* Valor anterior que fue leído por el thread
+* Valor nuevo que debe sobrescribir el anterior
 
-*CAS dice "Yo creo que la posicion V deberia tener el valor A; Si esto se cumple entonces pongo el valor B, si esto no se cumple aviso que no se cumplio la substitución". CAS es un locking optimista ya que continua con el update con la esperanza de poder realizarlo, y puede detectar si algun thread actualizo el valor.*
+*CAS dice "Yo creo que la posición V debería tener el valor A; Si esto se cumple entonces pongo el valor B, si esto no se cumple aviso que no se cumplió la substitución". CAS es un locking optimista ya que continua con el update con la esperanza de poder realizarlo, y puede detectar si algún thread actualizo el valor.*
 
 Revisemos esto con un ejemplo.
 
@@ -28,9 +28,9 @@ ELSE
 	RETURN V
 ----
 
-Como se puede observar el valor de V sera 11
+Como se puede observar el valor de V será 11
 
-- El thread 2 llega e intenta la misma operacion
+- El thread 2 llega e intenta la misma operación
 
 V = 11, A = 10, B = 11
 
@@ -42,10 +42,10 @@ ELSE
 	RETURN V
 ----
 
-- En este caso el valor de V no es igual al de A entonces la operacion falla. Dado que el thread 2 ve que no pudo realizar la operacion, vuelve a intentarlo con nuevos valores
+- En este caso el valor de V no es igual al de A entonces la operación falla. Dado que el thread 2 ve que no pudo realizar la operación, vuelve a intentarlo con nuevos valores
 
 V = 11, A = 11, B = 12
 
-Ahroa la condicion se cumple y se incrementa el valor a 12.
+Ahora la condición se cumple y se incrementa el valor a 12.
 
-En resumen, cuando multiples threads intentan actualizar la misma variable de forma simultanea usando CAS, uno de ellos realiza la actualizacion y el resto detecta ese cambio y vuelve a intentarlo con nuevos valores, de esta forma no hay bloqueo entre los thread y estos son libres de reintentar la operacion o de no hacer nada.
+En resumen, cuando múltiples threads intentan actualizar la misma variable de forma simultanea usando CAS, uno de ellos realiza la actualización y el resto detecta ese cambio y vuelve a intentarlo con nuevos valores, de esta forma no hay bloqueo entre los thread y estos son libres de reintentar la operación o de no hacer nada.

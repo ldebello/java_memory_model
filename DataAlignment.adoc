@@ -2,7 +2,7 @@
 
 _Extraido de http://www.ibm.com/developerworks/library/pa-dalign/[IBM developerWorks]_
 
-Cuando hablamos de "Data alignment" nos referimos a como los datos estaran, alineados en la memoria. Nuestro software puede ser impactado por como esten alineado los datos o hasta llegar a no funcionar.
+Cuando hablamos de "Data alignment" nos referimos a como los datos estarán, alineados en la memoria. Nuestro software puede ser impactado por como estén alineado los datos o hasta llegar a no funcionar.
 
 == Memory access granularity
 
@@ -14,22 +14,22 @@ Sin embargo, las computadoras no leen y escriben en la memoria byte x byte, sino
 
 image::images/data_alignment/002.jpg[]
 
-La diferencia entre como los programadores piensan en la memoria y como los procesadores modernos trabajan con la memoria, puede generar diveros problemas contemplados en este articulo.
-Algunos problemas tipicos que podemos enfrentar al manejar datos desalineados:
+La diferencia entre como los programadores piensan en la memoria y como los procesadores modernos trabajan con la memoria, puede generar diversos problemas contemplados en este articulo.
+Algunos problemas típicos que podemos enfrentar al manejar datos desalineados:
 
 * Performance issue
-* La aplicacion se puede frizar
+* La aplicación se puede frizar
 * El sistema operativo se puede frizar
-* La aplicacion puede fallar y generar resultados incorrectos
+* La aplicación puede fallar y generar resultados incorrectos
 
 ---
 
 == Fundamentos (Alignment fundamentals)
 
-Para ilustrar los principios detras de esto, podemos examinar algunos ejemplos y como distintos
-tamaños afectan el comportamentieto.
+Para ilustrar los principios detrás de esto, podemos examinar algunos ejemplos y como distintos
+tamaños afectan el comportamiento.
 
-Leer 4 bytes desde la direccion 0 y almacenar esto en un registro, luego vamos a leer 4 bytes pero desde la direccion 1. +
+Leer 4 bytes desde la dirección 0 y almacenar esto en un registro, luego vamos a leer 4 bytes pero desde la dirección 1. +
 Veamos que sucede si el "memory access granularity" es de 1 byte
 
 image::images/data_alignment/003.jpg[]
@@ -38,32 +38,32 @@ Esto se ajusta a nuestra ingenua idea de como la memoria funciona: Podemos ver q
 
 image::images/data_alignment/004.jpg[]
 
-Cuando leemos desde la direccion 0, el procesador necesita la mitad de acceso a la memoria, pero cuando leemos desde la direccion 1, los datos estan desalineados, entonces se deben procesar acceso innecesarios. +
+Cuando leemos desde la dirección 0, el procesador necesita la mitad de acceso a la memoria, pero cuando leemos desde la dirección 1, los datos están desalineados, entonces se deben procesar acceso innecesarios. +
 Por ultimo vamos a analizar que pasa con un procesador con 4 bytes de "memory access granularity" como el 68030 o PowerPC® 601:
 
 image::images/data_alignment/005.jpg[]
 
-Un procesador con 4 bytes de granularidad puede obtener 4 bytes desde una direccion alineada con un solo acceso. Tambien debemos notar que acceder desde una direccion no alineada duplica el numero de accesos. +
-Ahora que revisamos los fundamentos basicos detras del alineamineto de datos podemos explorar otros problemas relacionados con esto.
+Un procesador con 4 bytes de granularidad puede obtener 4 bytes desde una dirección alineada con un solo acceso. También debemos notar que acceder desde una dirección no alineada duplica el numero de accesos. +
+Ahora que revisamos los fundamentos básicos detrás del alineamiento de datos podemos explorar otros problemas relacionados con esto.
 
 ---
 
 == Lazy processors
 
-Un procesador tiene que aplicar algunos trucos a la hora de acceder a datos no alineados. Volviendo al ejemplo donde leemos 4 bytes desde la direccion 1 con granularidad de 4 bytes, esto es lo que sucede:
+Un procesador tiene que aplicar algunos trucos a la hora de acceder a datos no alineados. Volviendo al ejemplo donde leemos 4 bytes desde la dirección 1 con granularidad de 4 bytes, esto es lo que sucede:
 
 image::images/data_alignment/006.jpg[]
 
-El procesador lee el primer chunck de 4 bytes, dado que estamos leyendo desde una direccion no alineada debemos remover los bytes que no necesitamos de este chunk. Luego lee el segundo chunk y debe remover los bytes no deseados del final, luego se hace un merge entre estos dos chunks y se almacena en un registro. Esto es mucho trabajo.
+El procesador lee el primer chunk de 4 bytes, dado que estamos leyendo desde una dirección no alineada debemos remover los bytes que no necesitamos de este chunk. Luego lee el segundo chunk y debe remover los bytes no deseados del final, luego se hace un merge entre estos dos chunks y se almacena en un registro. Esto es mucho trabajo.
 
-Algunos procesadores no estan dispuestos a hacer todo ese trabajo por nosotros.
+Algunos procesadores no están dispuestos a hacer todo ese trabajo por nosotros.
 
-El original 68000 era un procesador con granularidad de 2 bytes y no disponia de la capacidad para leer direccion no alineadas, por lo cual frente a esta situacion el procesador arrojaba una excepcion. El procesador original de Mac OS no maneja esta operacion y ni siquiera arrojaba una excepcion, y normalmente obligaba al usuario a reinicar la maquina. Ouch.
+El original 68000 era un procesador con granularidad de 2 bytes y no disponía de la capacidad para leer dirección no alineadas, por lo cual frente a esta situación el procesador arrojaba una excepción. El procesador original de Mac OS no maneja esta operación y ni siquiera arrojaba una excepción, y normalmente obligaba al usuario a reiniciar la maquina. Ouch.
 
-Procesadores mas modernos en la serie 680x0 como el 68020, manejaban esto y realizaban el trabajo necesario por nosotros. Esto explica porque algunos software viejos funcionaban en la 68020 pero no en 68000. Esto tambien explica por que, antes algunos developers de Mac inicializaban punteros con direcciones impares, en la Mac original si el puntero era accedido sin ser reasignado a una direccion valida, automicatement se caia en el debugger, y en este estado se podia analizar el stack de llamadas y descubrir el problema.
+Procesadores mas modernos en la serie 680x0 como el 68020, manejaban esto y realizaban el trabajo necesario por nosotros. Esto explica porque algunos software viejos funcionaban en la 68020 pero no en 68000. Esto también explica por que, antes algunos developers de Mac inicializaban punteros con direcciones impares, en la Mac original si el puntero era accedido sin ser reasignado a una dirección valida, automáticamente se caía en el debugger, y en este estado se podía analizar el stack de llamadas y descubrir el problema.
 
-Todos los procesadores tienen un numero finitos de transistores para realizar el trabajo. Soportar accesos a datos desalineados reduce el numero de transistores para otras tareas, en lugar agregar mas funcionalidad o de hacer trabajar mas rapido al procesador, deben cumplir otras funciones. Un ejemplo de un procesador el cual prefirio sacrificar el soporte para datos alineados y hacer mas rapido su trabajo es MIPS.
+Todos los procesadores tienen un numero finitos de transistores para realizar el trabajo. Soportar accesos a datos desalineados reduce el numero de transistores para otras tareas, en lugar agregar mas funcionalidad o de hacer trabajar mas rápido al procesador, deben cumplir otras funciones. Un ejemplo de un procesador el cual prefirió sacrificar el soporte para datos alineados y hacer mas rápido su trabajo es MIPS.
 
-PowerPC toma una enfoque hibrido. Cada procesador PowerPC hasta la fecha tiene soporte a nivel hardware para acceso a datos desalineados de 32 bit. De esta forma igual sufrimos una penalizacion por este acceso pero esta es menor.
+PowerPC toma una enfoque hibrido. Cada procesador PowerPC hasta la fecha tiene soporte a nivel hardware para acceso a datos desalineados de 32 bit. De esta forma igual sufrimos una penalización por este acceso pero esta es menor.
 
-Por otro lado, los procesadores modernos PowerPC no poseen soporte a nivel de hardware para acceso a datos desalineados de 64 bits. Cuando se le solicita cargar un numero de punto flotante desde la memoria, este arroja una excepcion y el software sera el encargado de este acceso a datos, realizar alineamiento por medio de software es mucho mas lento que a nivel de hardware
+Por otro lado, los procesadores modernos PowerPC no poseen soporte a nivel de hardware para acceso a datos desalineados de 64 bits. Cuando se le solicita cargar un numero de punto flotante desde la memoria, este arroja una excepción y el software será el encargado de este acceso a datos, realizar alineamiento por medio de software es mucho mas lento que a nivel de hardware
