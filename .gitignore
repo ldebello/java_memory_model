@@ -9,6 +9,10 @@
 *.ipr
 *.iws
 
+# JCStress results
+*.bin.gz
+results/
+
 # Maven
 target/
 

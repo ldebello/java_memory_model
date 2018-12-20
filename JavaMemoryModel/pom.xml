@@ -23,9 +23,12 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <jol-core.version>0.9</jol-core.version>
+        <jcstress-core.version>0.5</jcstress-core.version>
+        <jcstress-uber-jar.name>jcstress</jcstress-uber-jar.name>
     </properties>
 
     <modules>
         <module>JavaObjectLayout</module>
+        <module>JCStressTestCases</module>
     </modules>
 </project>
