@@ -1,9 +1,10 @@
 package ar.com.javamemorymodel.objectlayout;
+
 import org.openjdk.jol.info.ClassLayout;
 import org.openjdk.jol.vm.VM;
 
 /*
- * Este ejemplo se encuentra en el proyecto "jol-samples" del repositorio de JOL.
+ * Este ejemplo esta extraido del proyecto "jol-samples" del repositorio de JOL.
  */
 public class JOLSample_01_Basic {
 	

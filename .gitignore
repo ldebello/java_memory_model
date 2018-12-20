@@ -3,20 +3,14 @@
 .project
 .settings/
 
-# Dependencies
-lib/
+# Intellij
+.idea/
+*.iml
+*.ipr
+*.iws
 
 # Maven
 target/
-
-# Gradle
-.gradle
-build/
-bin/
-
-# JCStress Gradle Plugin
-results/
-jcstress.*
 
 # Mac
 .DS_Store
