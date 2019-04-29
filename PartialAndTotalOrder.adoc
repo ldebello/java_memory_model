@@ -17,7 +17,7 @@ Como veremos pronto, en este caso "fits" es un orden parcial en un conjunto de r
 
 Si todos los pares de cajas tuvieran un orden relativo _por ejemplo, si consideramos este conjunto sin la caja D_ podriamos definir un orden total en el conjunto. Otro ejemplo es un conjunto de cuadrados en 2D (En lugar de rectangulos); siempre y cuando todos los cuadrados en el conjunto tengan un tamaño unico.footnote:[Como habran notado se utilizo la palabra "unico" lo cual hablando de conjuntos puede sonar superfluo; despues de todo, los conjuntos estan definidos para tener elementos distintos. Dicho eso, no es claro lo que "distinto" significa. En nuestro caso, distinto puede referirse a la identidad completa de las cajas; por ejemplo, dos cajas pueden tener las mismas dimensiones pero distinto color - entonces ellas no serian lo mismo desde el punto de vista de un conjunto. Ademas, en programación, la identidad es aún más discutible y puede definirse para tipos específicos de maneras específicas.], siempre podemos definir un orden total en ellos porque para cada par de cuadrados el primero puede caber en el segundo o vice versa.
 
-== Definicion matematica
+== Relaciones - Definicion matematica
 
 Vamos a desarrolar un enfoque matematico acerca del ordenamiento, por lo cual tendremos que sumergirnos en teoria de conjuntos
 y relaciones, solo vamos a hablar de relaciones binarias.
@@ -33,4 +33,10 @@ Es importante notar que definimos explícitamente los pares a ordenar, lo que si
 Por definicion, cualquier subconjunto de `A x A` es una relacion de A. Por ejemplo `R = {(1, 1), (2, 2), (3, 3)}`, en programaccion usualmente usamos el termino "predicate" para expresar una idea similar. Un predicado es una funcion con un resultado binario, y la correspondencia con relaciones es trivial - nosotros decimos que todos los pares que pertenencen a la relacion satisfacen el predicado y vice versa. Si definimos un predicado R(x, y) para ser verdadero si y solo si `x == y`, obtendremos la relacion anterior.
 
 Una notacion abreviada que hara las definiciones mas claras; nosotros decimos `xRy` cuando `(x, y) ∈ R`. En nuestro conjunto de ejemplo `1R1`, `2R2` y `3R3`. Esta notacion es media rara, pero es la aceptada en matematica; por lo tanto usaremos esa para consistencia con otras fuentes.
+
+Ademas, se torma mas practico cuando R es un operador. Si redefinimos R como ==, se vuelve mas natural: `1==1`, `2==2` y `3==3`. La relacion de igualdad es una relacion perfectamente valida en un conjunto - sus elementos son todos los pares donde los miembros tienen el mismo valor.
+
+== Relaciones - Propiedades
+
+Las relaciones tienen un numero util de propiedades. Aqui solo veremos algunas que necesitamos para el resto del articulo; para una lista mas completa, revisar la https://en.wikipedia.org/wiki/Binary_relation[pagina de Wikipedia].
 
