@@ -16,11 +16,11 @@ import java.util.BitSet;
  * @Arbiter: Este método es invocado luego que todos los actores vieron el estado y a este punto todos los efectos en memoria son visibles
  */
 @JCStressTest
-@Description("Utilizando BitSet desde multiples threads")
+@Description("Testing BitSet concurrency")
 @State
-@Outcome(id = "[true, true]", expect = Expect.ACCEPTABLE, desc = "Los updates se ven de forma correcta")
-@Outcome(id = "[true, false]", expect = Expect.ACCEPTABLE_INTERESTING, desc = "Thread 2 sobrrescribre Thread 1")
-@Outcome(id = "[false, true]", expect = Expect.ACCEPTABLE_INTERESTING, desc = "Thread 1 sobrrescribre Thread 2")
+@Outcome(id = "true, true", expect = Expect.ACCEPTABLE, desc = "Updates ok")
+@Outcome(id = "true, false", expect = Expect.ACCEPTABLE_INTERESTING, desc = "Thread 2 override Thread 1")
+@Outcome(id = "false, true", expect = Expect.ACCEPTABLE_INTERESTING, desc = "Thread 1 override Thread 2")
 public class BitSetConcurrencyTest {
 
     private BitSet sharedBitSet = new BitSet();
