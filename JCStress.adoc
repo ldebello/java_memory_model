@@ -6,4 +6,5 @@ Es una herramienta la cual nos permite hacer tests de concurrencia.
 Dentro de este repositorio hay una carpeta llamada *JavaMemoryModel* la cual es un proyecto maven multi modulo.
 El modulo *JCStressTestCases* fue creado con el archetype "org.openjdk.jcstress:jcstress-java-test-archetype:0.5" siguiendo en este https://wiki.openjdk.java.net/display/CodeTools/jcstress[link]
 
-Para ejecutar los tests solo tenemos que compilar nuestro proyecto y ejecutar ```java -jar JCStressTestCases/target/jcstress.jar```
+Para ejecutar los tests solo tenemos que compilar nuestro proyecto y ejecutar `java -jar JCStressTestCases/target/jcstress.jar`
+Si queremos ejecutar un test especifico podemos usar `java -jar JCStressTestCases/target/jcstress.jar -v -t ar.com.javamemorymodel.jcstress.PossibleReordering`
