@@ -5,16 +5,6 @@ import org.openjdk.jcstress.infra.results.ZZ_Result;
 
 import java.util.BitSet;
 
-/*
- * Para utilizar JCStress utilizamos distintas annotations:
- *
- * @JCStressTest: Marca esta clase como un test
- * @Description: Para incluir una descripción para el test
- * @State: Marca esta clase para ser usada como clase de estado del test, las clases de estado deben tener constructor por defecto y todas las inicializaciones del constructor son vistas por los actores
- * @Actor: Cada método marcado con @Actor es ejecutado por un thread
- * @Outcome: Cada @Outcome indica posibles resultados
- * @Arbiter: Este método es invocado luego que todos los actores vieron el estado y a este punto todos los efectos en memoria son visibles
- */
 @JCStressTest
 @Description("Testing BitSet concurrency")
 @State
